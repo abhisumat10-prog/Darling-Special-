@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Challenge 2 - Reference: Responsive Navbar</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      min-height: 100vh;
+    }
+
+    .site-header {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      height: 64px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 18px;
+      text-decoration: none;
+      color: #0f172a;
+    }
+
+    .brand-logo svg {
+      width: 24px;
+      height: 24px;
+      fill: #2563eb;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      color: #475569;
+      font-size: 15px;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+
+    .nav-link:hover {
+      color: #0f172a;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-cta {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.15s ease;
+    }
+
+    .btn-cta:hover {
+      background: #334155;
+    }
+
+    /* Mobile Hamburger Button */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+      color: #0f172a;
+      border-radius: 6px;
+    }
+
+    .mobile-menu-btn:focus-visible {
+      outline: 2px solid #2563eb;
+    }
+
+    .mobile-drawer {
+      display: none;
+    }
+
+    /* Responsive Mobile Styles */
+    @media (max-width: 768px) {
+      .nav-menu, .nav-actions {
+        display: none;
+      }
+
+      .mobile-menu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .mobile-drawer {
+        display: block;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s cubic-bezier(0, 1, 0, 1);
+        background: #ffffff;
+        border-top: 1px solid #f1f5f9;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+      }
+
+      .mobile-drawer.is-open {
+        max-height: 400px;
+        transition: max-height 0.3s ease-in-out;
+      }
+
+      .mobile-nav-list {
+        list-style: none;
+        padding: 16px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .mobile-nav-link {
+        text-decoration: none;
+        color: #334155;
+        font-size: 16px;
+        font-weight: 500;
+        display: block;
+        padding: 8px 0;
+      }
+
+      .mobile-btn-cta {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin-top: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="#" class="brand-logo" aria-label="LeetCode for Frontend homepage">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span>FrontendCode</span>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav aria-label="Main Navigation">
+        <ul class="nav-menu">
+          <li><a href="#" class="nav-link">Challenges</a></li>
+          <li><a href="#" class="nav-link">Leaderboard</a></li>
+          <li><a href="#" class="nav-link">Practice Tracks</a></li>
+          <li><a href="#" class="nav-link">Pricing</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button type="button" class="btn-cta">Sign In</button>
+      </div>
+
+      <!-- Mobile Toggle Button -->
+      <button 
+        type="button" 
+        class="mobile-menu-btn" 
+        id="menuToggle" 
+        aria-expanded="false" 
+        aria-controls="mobileDrawer" 
+        aria-label="Toggle navigation menu"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-drawer" id="mobileDrawer">
+      <ul class="mobile-nav-list">
+        <li><a href="#" class="mobile-nav-link">Challenges</a></li>
+        <li><a href="#" class="mobile-nav-link">Leaderboard</a></li>
+        <li><a href="#" class="mobile-nav-link">Practice Tracks</a></li>
+        <li><a href="#" class="mobile-nav-link">Pricing</a></li>
+        <li><button type="button" class="btn-cta mobile-btn-cta">Sign In</button></li>
+      </ul>
+    </div>
+  </header>
+
+  <script>
+    const toggleBtn = document.getElementById('menuToggle');
+    const drawer = document.getElementById('mobileDrawer');
+
+    if (toggleBtn && drawer) {
+      toggleBtn.addEventListener('click', () => {
+        const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+        toggleBtn.setAttribute('aria-expanded', String(!isExpanded));
+        drawer.classList.toggle('is-open');
+      });
+
+      // Close on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && drawer.classList.contains('is-open')) {
+          toggleBtn.setAttribute('aria-expanded', 'false');
+          drawer.classList.remove('is-open');
+          toggleBtn.focus();
+        }
+      });
+    }
+  </script>
+</body>
+</html>

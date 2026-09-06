@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Accessible Modal Dialog Challenge</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+    }
+
+    /* 
+      TODO: Style the modal overlay and dialog
+      - Dark semi-transparent backdrop
+      - Clean centered dialog card with warning icon
+      - Contrast-compliant buttons
+    */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-box {
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 12px;
+      max-width: 440px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 
+    TODO: Add proper ARIA attributes:
+    - role="dialog" and aria-modal="true"
+    - aria-labelledby and aria-describedby
+    - aria-label for close button
+    - Keyboard Escape key listener
+  -->
+  <div class="modal-overlay">
+    <div class="modal-box">
+      <h2>Deactivate Team Account</h2>
+      <p>Are you sure you want to deactivate your team workspace?</p>
+      <div>
+        <button>Cancel</button>
+        <button style="background: red; color: white;">Confirm</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

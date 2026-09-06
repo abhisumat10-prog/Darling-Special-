@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GradeRequest",
+  "description": "Payload sent to the /grade serverless endpoint for evaluation",
+  "type": "object",
+  "required": ["challengeId", "submittedCode", "visualDiff", "axeReport"],
+  "properties": {
+    "challengeId": {
+      "type": "string",
+      "description": "Unique identifier for the challenge (e.g., 'challenge-1-pricing-card')"
+    },
+    "submittedCode": {
+      "type": "object",
+      "required": ["html", "css"],
+      "properties": {
+        "html": {
+          "type": "string",
+          "description": "Submitted HTML source code"
+        },
+        "css": {
+          "type": "string",
+          "description": "Submitted CSS source code"
+        },
+        "js": {
+          "type": "string",
+          "description": "Submitted JavaScript source code (optional if HTML/CSS only)"
+        }
+      }
+    },
+    "visualDiff": {
+      "type": "object",
+      "required": ["diffPercentage", "pixelMismatchCount"],
+      "properties": {
+        "diffPercentage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage mismatch calculated by pixelmatch (0 = pixel perfect, 100 = completely different)"
+        },
+        "pixelMismatchCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Raw count of mismatched pixels"
+        },
+        "viewport": {
+          "type": "object",
+          "properties": {
+            "width": { "type": "integer" },
+            "height": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "axeReport": {
+      "type": "object",
+      "required": ["violationsCount", "violations"],
+      "properties": {
+        "violationsCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "violations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "impact", "description"],
+            "properties": {
+              "id": { "type": "string" },
+              "impact": {
+                "type": "string",
+                "enum": ["minor", "moderate", "serious", "critical"]
+              },
+              "description": { "type": "string" },
+              "helpUrl": { "type": "string" },
+              "nodesCount": { "type": "integer" },
+              "summary": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
