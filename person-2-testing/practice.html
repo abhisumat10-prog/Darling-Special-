@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.9.1/axe.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    .box { display: inline-block; vertical-align: top; margin: 10px; border: 2px solid black; }
+    #reference-box {
+      width: 300px; height: 200px;
+      background-color: lightblue;
+      padding-top: 20px;
+    }
+    #submission-box {
+      width: 300px; height: 200px;
+      background-color: lightblue;
+      padding-top: 20px;
+    }
+    button { padding: 10px 15px; background-color: green; color: white; border: none; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+  <h2>🎯 Reference Design (the correct one)</h2>
+  <div class="box" id="reference-box">
+    <h3>Hello World</h3>
+    <button>Click Me</button>
+  </div>
+
+  <h2>📝 Submission (what a "student" made)</h2>
+  <div class="box" id="submission-box">
+  <h3>Hello World</h3>
+  <button>Click Me</button>
+</div>
+
+  <br><br>
+  <button id="screenshotBtn">📸 Take Both Screenshots</button>
+
+  <div id="result"></div>
+
+  <!-- STEP 4: Take screenshots of both boxes -->
+  <script>
+    document.getElementById('screenshotBtn').addEventListener('click', async function() {
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '';
+
+      const refHeading = document.createElement('h3');
+      refHeading.textContent = 'Reference:';
+      resultDiv.appendChild(refHeading);
+
+      const referenceCanvas = await html2canvas(document.getElementById('reference-box'));
+      resultDiv.appendChild(referenceCanvas);
+
+      const subHeading = document.createElement('h3');
+      subHeading.textContent = 'Submission:';
+      resultDiv.appendChild(subHeading);
+
+      const submissionCanvas = await html2canvas(document.getElementById('submission-box'));
+      resultDiv.appendChild(submissionCanvas);
+
+      window.referenceCanvas = referenceCanvas;
+      window.submissionCanvas = submissionCanvas;
+    });
+  </script>
+
+  <!-- STEP 5: Compare the two screenshots with pixelmatch -->
+  <script type="module">
+    import pixelmatch from "https://esm.sh/pixelmatch@5.3.0";
+
+    document.getElementById('screenshotBtn').addEventListener('click', async function() {
+      setTimeout(function() {
+        compareImages();
+      }, 500);
+    });
+
+    function compareImages() {
+      const refCanvas = window.referenceCanvas;
+      const subCanvas = window.submissionCanvas;
+
+      if (!refCanvas || !subCanvas) {
+        console.log("Screenshots not ready yet!");
+        return;
+      }
+
+      const width = refCanvas.width;
+      const height = refCanvas.height;
+
+      const refData = refCanvas.getContext('2d').getImageData(0, 0, width, height);
+      const subData = subCanvas.getContext('2d').getImageData(0, 0, width, height);
+
+      const diffCanvas = document.createElement('canvas');
+      diffCanvas.width = width;
+      diffCanvas.height = height;
+      const diffCtx = diffCanvas.getContext('2d');
+      const diffData = diffCtx.createImageData(width, height);
+
+      const numDiffPixels = pixelmatch(
+        refData.data,
+        subData.data,
+        diffData.data,
+        width,
+        height,
+        { threshold: 0.1 }
+      );
+
+      diffCtx.putImageData(diffData, 0, 0);
+
+      const totalPixels = width * height;
+      const similarity = ((1 - numDiffPixels / totalPixels) * 100).toFixed(2);
+
+      window.lastSimilarityScore = parseFloat(similarity) / 100;
+      window.lastPixelsDifferent = numDiffPixels;
+
+      const resultDiv = document.getElementById('result');
+
+      const scoreHeading = document.createElement('h3');
+      scoreHeading.textContent = `✅ Similarity Score: ${similarity}% (${numDiffPixels} pixels different)`;
+      resultDiv.appendChild(scoreHeading);
+
+      const diffHeading = document.createElement('h3');
+      diffHeading.textContent = 'Difference Map (red = different areas):';
+      resultDiv.appendChild(diffHeading);
+      resultDiv.appendChild(diffCanvas);
+    }
+  </script>
+
+  <!-- STEP 6: Run accessibility check with axe-core -->
+  <script>
+    document.getElementById('screenshotBtn').addEventListener('click', function() {
+      setTimeout(function() {
+        runAccessibilityCheck();
+      }, 800);
+    });
+
+    function runAccessibilityCheck() {
+      axe.run(document.getElementById('submission-box')).then(function(results) {
+        const resultDiv = document.getElementById('result');
+
+        const a11yHeading = document.createElement('h3');
+        a11yHeading.textContent = `♿ Accessibility Check: ${results.violations.length} issue(s) found`;
+        resultDiv.appendChild(a11yHeading);
+
+        if (results.violations.length === 0) {
+          const goodMsg = document.createElement('p');
+          goodMsg.textContent = "No accessibility problems found. Nice!";
+          resultDiv.appendChild(goodMsg);
+        } else {
+          results.violations.forEach(function(violation) {
+            const issue = document.createElement('p');
+            issue.textContent = `❌ ${violation.id}: ${violation.description}`;
+            resultDiv.appendChild(issue);
+          });
+        }
+
+        window.accessibilityResults = results.violations;
+      });
+    }
+  </script>
+
+  <!-- STEP 7: Package everything into one clean object for Person 3 -->
+  <script>
+    document.getElementById('screenshotBtn').addEventListener('click', function() {
+      setTimeout(function() {
+        packageResults();
+      }, 1200);
+    });
+
+    function packageResults() {
+      const finalPackage = {
+        similarityScore: window.lastSimilarityScore ?? null,
+        pixelsDifferent: window.lastPixelsDifferent ?? null,
+        accessibilityViolations: window.accessibilityResults || []
+      };
+
+      console.log("📦 Final package for Person 3:", finalPackage);
+
+      const packageResultDiv = document.getElementById('result');
+
+      const packageHeading = document.createElement('h3');
+      packageHeading.textContent = '📦 Final Package (this goes to Person 3):';
+      packageResultDiv.appendChild(packageHeading);
+
+      const packageDisplay = document.createElement('pre');
+      packageDisplay.style.textAlign = 'left';
+      packageDisplay.style.background = '#f0f0f0';
+      packageDisplay.style.padding = '10px';
+      packageDisplay.style.display = 'inline-block';
+      packageDisplay.textContent = JSON.stringify(finalPackage, null, 2);
+      packageResultDiv.appendChild(packageDisplay);
+    }
+  </script>
+
+</body>
+</html>
