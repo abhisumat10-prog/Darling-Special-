@@ -1,101 +1,72 @@
 /**
  * Challenge Specs Registry
- * Defines Question 1 for testing the sandbox compiler and live preview.
+ * Challenge 1: Interactive Brightness Slider Component
+ * Tutorial: Practice Sandbox (Slider Pill UI)
  */
 
-const SAMPLE_CHALLENGE = {
-  id: "pricing-card-component",
-  title: "Challenge 1: Interactive Pricing Card Component",
+const CHALLENGE_1_SPEC = {
+  id: "brightness-slider-component",
+  mode: "challenge",
+  title: "Challenge 1: Interactive Brightness Slider Component",
   difficulty: "Easy",
-  category: "Responsive Components & A11y",
-  description: "Build an interactive, modern Pricing Card component based on the target design spec below. The component must feature a high contrast badge, pricing plan details, interactive monthly/yearly billing toggle with a 20% discount tag, and accessible semantic HTML.",
+  category: "Dynamic UI & State Control",
+  description: "Create an interactive UI component where a user can adjust a range slider from 0% to 100% to dynamically control the background brightness of a sample image or card element in real time.",
   requirements: [
-    "Use semantic HTML tags (<article>, <header>, <section>, <button>).",
-    "Ensure high text contrast ratio (4.5:1 minimum for WCAG AA compliance).",
-    "Implement interactive Monthly ($19/mo) / Yearly ($15/mo) toggle using JS.",
-    "Make the card responsive for mobile screens (<640px).",
-    "Include hover states for the 'Choose Plan' CTA button."
+    "Slider Range: 0 to 100, starting at a default initial value of 50.",
+    "Live Feedback: Display the current numeric percentage value (e.g. '50%') next to or above the slider.",
+    "Visual Update: As the slider moves, dynamically adjust the background brightness (or filter: brightness) of the target sample card/image in real time.",
+    "Ensure proper ARIA accessibility attributes (aria-label, aria-valuenow)."
   ],
-  specFigmaUrl: "https://www.figma.com/design/sample-pricing-card/Interactive-Pricing-Card",
-  specFigmaEmbedUrl: "https://www.figma.com/embed?embed_host=sandbox&url=https://www.figma.com/file/sample-pricing-card/Interactive-Pricing-Card",
-  figmaTokens: {
-    dimensions: { width: "360px", minHeight: "450px", borderRadius: "16px", borderWidth: "2px" },
-    colors: [
-      { label: "Card Background", hex: "#1E293B", token: "--bg-card" },
-      { label: "Border Accent", hex: "#6366F1", token: "--accent-primary" },
-      { label: "Badge Background", hex: "rgba(99, 102, 241, 0.2)", token: "--badge-bg" },
-      { label: "Badge Text", hex: "#818CF8", token: "--badge-text" },
-      { label: "Checkmark Icon", hex: "#10B981", token: "--accent-success" },
-      { label: "Page Background", hex: "#0F172A", token: "--bg-dark" }
-    ],
-    typography: [
-      { label: "Badge Font", value: "Fira Code / Inter, 12px, Weight 700" },
-      { label: "Price Amount", value: "Inter, 44px (2.75rem), Weight 800" },
-      { label: "Period Label", value: "Inter, 16px (1rem), #94A3B8" },
-      { label: "CTA Button Font", value: "Inter, 16px, Weight 700" }
-    ],
-    spacing: [
-      { label: "Card Padding", value: "32px (2rem)" },
-      { label: "Feature Gap", value: "12px (0.75rem)" },
-      { label: "Toggle Radius", value: "20px" }
-    ]
-  },
   specImageSvg: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400" fill="none">
     <rect width="600" height="400" fill="%230F172A"/>
-    <rect x="150" y="40" width="300" height="320" rx="16" fill="%231E293B" stroke="%236366F1" stroke-width="2"/>
-    <rect x="250" y="60" width="100" height="24" rx="12" fill="%236366F1" fill-opacity="0.2"/>
-    <text x="300" y="76" fill="%23818CF8" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">PRO PLAN</text>
-    <text x="300" y="120" fill="%23FFFFFF" font-family="sans-serif" font-size="36" font-weight="800" text-anchor="middle">$19<tspan font-size="16" fill="%2394A3B8">/month</tspan></text>
+    <!-- Card Container -->
+    <rect x="120" y="40" width="360" height="320" rx="16" fill="%231E293B" stroke="%23334155" stroke-width="2"/>
     
-    <!-- Toggle Pill -->
-    <rect x="220" y="145" width="160" height="32" rx="16" fill="%230F172A"/>
-    <rect x="224" y="149" width="76" height="24" rx="12" fill="%236366F1"/>
-    <text x="262" y="165" fill="%23FFFFFF" font-family="sans-serif" font-size="11" font-weight="600" text-anchor="middle">Monthly</text>
-    <text x="340" y="165" fill="%2394A3B8" font-family="sans-serif" font-size="11" font-weight="600" text-anchor="middle">Yearly -20%</text>
+    <!-- Dynamic Brightness Sample Image Box -->
+    <rect x="150" y="70" width="300" height="150" rx="12" fill="%236366F1" fill-opacity="0.5"/>
+    <text x="300" y="140" fill="%23FFFFFF" font-family="sans-serif" font-size="20" font-weight="bold" text-anchor="middle">Sample Image Card</text>
 
-    <!-- Bullet Features -->
-    <circle cx="200" cy="210" r="8" fill="%2310B981" fill-opacity="0.2"/>
-    <path d="M197 210L199 212L203 208" stroke="%2310B981" stroke-width="2" stroke-linecap="round"/>
-    <text x="220" y="214" fill="%23E2E8F0" font-family="sans-serif" font-size="13">Unlimited Projects & Workspaces</text>
+    <!-- Numeric Percentage Output Display -->
+    <text x="300" y="255" fill="%2306B6D4" font-family="sans-serif" font-size="28" font-weight="800" text-anchor="middle">50%</text>
 
-    <circle cx="200" cy="245" r="8" fill="%2310B981" fill-opacity="0.2"/>
-    <path d="M197 245L199 247L203 243" stroke="%2310B981" stroke-width="2" stroke-linecap="round"/>
-    <text x="220" y="249" fill="%23E2E8F0" font-family="sans-serif" font-size="13">Advanced AI Feedback & A11y Audit</text>
+    <!-- Range Slider Track -->
+    <rect x="170" y="285" width="260" height="10" rx="5" fill="%230F172A"/>
+    <rect x="170" y="285" width="130" height="10" rx="5" fill="%236366F1"/>
+    <!-- Thumb Handle -->
+    <circle cx="300" cy="290" r="14" fill="%23FFFFFF" stroke="%236366F1" stroke-width="4"/>
 
-    <circle cx="200" cy="280" r="8" fill="%2310B981" fill-opacity="0.2"/>
-    <path d="M197 280L199 282L203 278" stroke="%2310B981" stroke-width="2" stroke-linecap="round"/>
-    <text x="220" y="284" fill="%23E2E8F0" font-family="sans-serif" font-size="13">Priority 24/7 Support</text>
-
-    <!-- Button -->
-    <rect x="180" y="310" width="240" height="38" rx="8" fill="%236366F1"/>
-    <text x="300" y="334" fill="%23FFFFFF" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">Choose Pro Plan</text>
+    <text x="300" y="335" fill="%2394A3B8" font-family="sans-serif" font-size="12" text-anchor="middle">Adjust slider to control card brightness dynamically</text>
   </svg>`,
 
-  // Default starter code for testing submit, error highlighting, and compilation
   starterCode: {
-    html: `<article class="card" aria-labelledby="card-title">
-  <div class="badge">PRO PLAN</div>
-  <h2 id="card-title" class="title">Interactive Pro Plan</h2>
-  <div class="price-box">
-    <span id="price-amount" class="amount">$19</span>
-    <span id="price-period" class="period">/month</span>
+    html: `<div class="slider-card">
+  <h2>Brightness Controller</h2>
+  
+  <!-- Target Sample Card to change brightness -->
+  <div id="sample-card" class="sample-card">
+    <span class="card-icon">💡</span>
+    <p>Sample Visual Card</p>
   </div>
 
-  <div class="toggle-container">
-    <button id="toggle-btn" class="toggle-btn" aria-label="Toggle Monthly or Yearly billing">
-      <span id="monthly-label" class="active">Monthly</span>
-      <span id="yearly-label">Yearly <small class="discount">-20%</small></span>
-    </button>
+  <!-- Live Feedback Display -->
+  <div class="feedback-display">
+    <span class="label">Current Brightness:</span>
+    <span id="value-display" class="value">50%</span>
   </div>
 
-  <ul class="features-list">
-    <li><span class="icon">✓</span> Unlimited Projects & Workspaces</li>
-    <li><span class="icon">✓</span> Advanced AI Feedback & A11y Audit</li>
-    <li><span class="icon">✓</span> Priority 24/7 Support</li>
-  </ul>
-
-  <button class="cta-btn">Choose Pro Plan</button>
-</article>`,
+  <!-- Range Slider (0 to 100, default 50) -->
+  <div class="slider-wrapper">
+    <input 
+      type="range" 
+      id="brightness-slider" 
+      min="0" 
+      max="100" 
+      value="50" 
+      aria-label="Adjust brightness percentage"
+      aria-valuenow="50"
+    >
+  </div>
+</div>`,
 
     css: `* {
   box-sizing: border-box;
@@ -111,152 +82,297 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  padding: 1rem;
+  padding: 1.5rem;
 }
 
-.card {
+.slider-card {
   background: #1e293b;
-  border: 2px solid #6366f1;
+  border: 1px solid #334155;
   border-radius: 16px;
   padding: 2rem;
   width: 100%;
-  max-width: 360px;
+  max-width: 400px;
   text-align: center;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
 }
 
-.badge {
-  display: inline-block;
-  background: rgba(99, 102, 241, 0.2);
-  color: #818cf8;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  margin-bottom: 0.75rem;
-  letter-spacing: 0.5px;
-}
-
-.title {
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
-}
-
-.price-box {
+.slider-card h2 {
+  font-size: 1.3rem;
   margin-bottom: 1.25rem;
+  color: #fff;
 }
 
-.amount {
-  font-size: 2.75rem;
-  font-weight: 800;
-  color: #ffffff;
-}
-
-.period {
-  font-size: 1rem;
-  color: #94a3b8;
-}
-
-.toggle-container {
-  margin-bottom: 1.5rem;
-}
-
-.toggle-btn {
-  background: #0f172a;
-  border: 1px solid #334155;
-  border-radius: 20px;
-  padding: 0.25rem 0.5rem;
-  cursor: pointer;
-  display: inline-flex;
-  gap: 0.5rem;
-  color: #94a3b8;
-  font-size: 0.85rem;
-  transition: all 0.2s ease;
-}
-
-.toggle-btn span {
-  padding: 0.3rem 0.75rem;
-  border-radius: 14px;
-  transition: all 0.2s ease;
-}
-
-.toggle-btn span.active {
-  background: #6366f1;
-  color: #ffffff;
-  font-weight: 600;
-}
-
-.discount {
-  color: #10b981;
-  font-weight: 700;
-}
-
-.features-list {
-  list-style: none;
-  text-align: left;
-  margin-bottom: 1.75rem;
+.sample-card {
+  background: linear-gradient(135deg, #6366f1, #06b6d4);
+  border-radius: 12px;
+  height: 140px;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-}
-
-.features-list li {
-  font-size: 0.9rem;
-  color: #cbd5e1;
-  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  transition: filter 0.1s ease;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
 }
 
-.icon {
-  color: #10b981;
-  font-weight: bold;
+.card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.4rem;
 }
 
-.cta-btn {
+.sample-card p {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.feedback-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.label {
+  color: #94a3b8;
+}
+
+.value {
+  color: #06b6d4;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.slider-wrapper {
+  margin-top: 0.5rem;
+}
+
+input[type="range"] {
   width: 100%;
-  background: #6366f1;
-  color: #ffffff;
-  border: none;
-  padding: 0.85rem;
-  font-size: 1rem;
-  font-weight: 700;
-  border-radius: 8px;
+  accent-color: #6366f1;
+  height: 8px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.15s ease;
-}
-
-.cta-btn:hover {
-  background: #4f46e5;
-  transform: translateY(-2px);
 }`,
 
-    js: `// Interactive Toggle Handler
+    js: `// Dynamic Brightness Slider Controller
 document.addEventListener('DOMContentLoaded', () => {
-  const toggleBtn = document.getElementById('toggle-btn');
-  const amountEl = document.getElementById('price-amount');
-  const periodEl = document.getElementById('price-period');
-  const monthlyLabel = document.getElementById('monthly-label');
-  const yearlyLabel = document.getElementById('yearly-label');
+  const slider = document.getElementById('brightness-slider');
+  const valueDisplay = document.getElementById('value-display');
+  const sampleCard = document.getElementById('sample-card');
 
-  let isYearly = false;
+  if (slider && valueDisplay && sampleCard) {
+    const updateBrightness = () => {
+      const val = slider.value;
+      // Update Live Feedback Text
+      valueDisplay.textContent = val + '%';
+      slider.setAttribute('aria-valuenow', val);
+      
+      // Update Visual Background Brightness (0% to 200% scale)
+      const brightnessScale = val / 50; // 50% = 1.0 normal brightness
+      sampleCard.style.filter = 'brightness(' + brightnessScale + ')';
+    };
 
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
-      isYearly = !isYearly;
-      if (isYearly) {
-        amountEl.textContent = '$15';
-        periodEl.textContent = '/month (billed yearly)';
-        monthlyLabel.classList.remove('active');
-        yearlyLabel.classList.add('active');
+    slider.addEventListener('input', updateBrightness);
+    updateBrightness(); // initial render
+  }
+});`
+  }
+};
+
+const TUTORIAL_SPEC = {
+  id: "tutorial-sandbox",
+  mode: "tutorial",
+  title: "Tutorial Sandbox (Practice Mode)",
+  difficulty: "Practice",
+  category: "Freeform Experimentation",
+  description: "Welcome to the Tutorial Sandbox! This is a freeform practice area where you can write, test, and experiment with HTML, CSS, and JavaScript. Note: This playground resets code every time it is opened.",
+  requirements: [
+    "Feel free to edit the pre-loaded Slider Pill UI code below.",
+    "Click 'Run / Preview' or 'Submit Code' to see live rendered output.",
+    "Practice layout building, animation, or JS events without restrictions."
+  ],
+  specImageSvg: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400" fill="none">
+    <rect width="600" height="400" fill="%230F172A"/>
+    <rect x="150" y="80" width="300" height="240" rx="16" fill="%231E293B" stroke="%2306B6D4" stroke-width="2"/>
+    <text x="300" y="140" fill="%2306B6D4" font-family="sans-serif" font-size="22" font-weight="bold" text-anchor="middle">Tutorial Playground</text>
+    
+    <!-- Pill UI preview -->
+    <rect x="220" y="180" width="160" height="44" rx="22" fill="%230F172A" stroke="%23334155"/>
+    <circle cx="244" cy="202" r="16" fill="%2306B6D4"/>
+    <text x="310" y="207" fill="%23E2E8F0" font-family="sans-serif" font-size="14" font-weight="bold">ON</text>
+
+    <text x="300" y="280" fill="%2394A3B8" font-family="sans-serif" font-size="13" text-anchor="middle">Interactive Slider Pill UI Starter Template</text>
+  </svg>`,
+
+  starterCode: {
+    html: `<div class="playground-card">
+  <h2>Interactive Slider Pill UI</h2>
+  <p class="subtitle">Click the pill toggle switch below:</p>
+
+  <!-- Slider Pill UI Component -->
+  <div class="pill-container">
+    <button id="pill-toggle" class="pill-toggle" aria-pressed="false">
+      <span class="pill-handle"></span>
+      <span id="pill-text" class="pill-text">OFF</span>
+    </button>
+  </div>
+
+  <div id="status-card" class="status-card off">
+    <span id="status-icon">🌙</span>
+    <span id="status-msg">State: Inactive</span>
+  </div>
+</div>`,
+
+    css: `* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #0b0f19;
+  color: #f8fafc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+.playground-card {
+  background: #151d2a;
+  border: 1px solid #2a364f;
+  border-radius: 16px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+.playground-card h2 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin-bottom: 1.75rem;
+}
+
+.pill-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.pill-toggle {
+  width: 140px;
+  height: 48px;
+  background-color: #0d1117;
+  border: 2px solid #2a364f;
+  border-radius: 24px;
+  padding: 4px;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pill-handle {
+  width: 36px;
+  height: 36px;
+  background-color: #94a3b8;
+  border-radius: 50%;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+}
+
+.pill-text {
+  position: absolute;
+  right: 18px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #94a3b8;
+  transition: all 0.3s ease;
+}
+
+/* Active State */
+.pill-toggle.active {
+  background-color: rgba(6, 182, 212, 0.15);
+  border-color: #06b6d4;
+}
+
+.pill-toggle.active .pill-handle {
+  transform: translateX(90px);
+  background-color: #06b6d4;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.6);
+}
+
+.pill-toggle.active .pill-text {
+  right: auto;
+  left: 18px;
+  color: #06b6d4;
+}
+
+.status-card {
+  padding: 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.status-card.off {
+  background-color: rgba(148, 163, 184, 0.1);
+  color: #94a3b8;
+}
+
+.status-card.on {
+  background-color: rgba(6, 182, 212, 0.2);
+  color: #67e8f9;
+}`,
+
+    js: `// Interactive Pill UI Handler
+document.addEventListener('DOMContentLoaded', () => {
+  const pillBtn = document.getElementById('pill-toggle');
+  const pillText = document.getElementById('pill-text');
+  const statusCard = document.getElementById('status-card');
+  const statusIcon = document.getElementById('status-icon');
+  const statusMsg = document.getElementById('status-msg');
+
+  let isActive = false;
+
+  if (pillBtn) {
+    pillBtn.addEventListener('click', () => {
+      isActive = !isActive;
+      pillBtn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+
+      if (isActive) {
+        pillBtn.classList.add('active');
+        pillText.textContent = 'ON';
+        statusCard.className = 'status-card on';
+        statusIcon.textContent = '☀️';
+        statusMsg.textContent = 'State: Active & Glowing';
       } else {
-        amountEl.textContent = '$19';
-        periodEl.textContent = '/month';
-        yearlyLabel.classList.remove('active');
-        monthlyLabel.classList.add('active');
+        pillBtn.classList.remove('active');
+        pillText.textContent = 'OFF';
+        statusCard.className = 'status-card off';
+        statusIcon.textContent = '🌙';
+        statusMsg.textContent = 'State: Inactive';
       }
     });
   }
 });`
   }
 };
+
+window.CHALLENGE_1_SPEC = CHALLENGE_1_SPEC;
+window.TUTORIAL_SPEC = TUTORIAL_SPEC;
