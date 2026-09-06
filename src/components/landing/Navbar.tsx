@@ -9,7 +9,7 @@ export default function Navbar() {
       className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-5 mix-blend-difference"
     >
       <a href="/" className="font-mono text-sm tracking-widest font-bold uppercase text-white">
-        LC<span className="text-[#ccff00]">/</span>FE
+        Pixel<span className="text-[#ccff00]">Proof</span>
       </a>
       
       <div className="hidden md:flex items-center gap-8 text-xs font-mono tracking-widest uppercase text-neutral-400">

@@ -106,7 +106,7 @@ class SpecViewerManager {
       reqListEl.replaceChildren(...challenge.requirements.map(requirement => {
         const item = document.createElement('div');
         item.className = 'requirement-item';
-        item.textContent = `📌 ${requirement}`;
+        item.textContent = requirement;
         return item;
       }));
     }

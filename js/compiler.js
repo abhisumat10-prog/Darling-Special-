@@ -92,6 +92,18 @@ class CodeCompilerEngine {
       });
     }
 
+    if (!isInitial) {
+      document.dispatchEvent(new CustomEvent('sandbox:submission', {
+        detail: {
+          html: buffers.html,
+          css: buffers.css,
+          js: buffers.js,
+          mode: this.editorManager.mode,
+          timestamp: new Date().toISOString()
+        }
+      }));
+    }
+
     return true;
   }
 

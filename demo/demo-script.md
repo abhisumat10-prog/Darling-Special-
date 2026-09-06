@@ -1,6 +1,6 @@
 # Hackathon Presentation & Demo Script (2.5 - 3 Minutes)
 
-## Pitch Title: "LeetCode for Frontend: Engineering Craft Over Abstract Algorithmic Trivia"
+## Pitch Title: "PixelProof: Engineering Craft Over Abstract Algorithmic Trivia"
 
 ---
 

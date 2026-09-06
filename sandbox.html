@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Frontend Sandbox Platform</title>
+  <title>PixelProof — Challenge Workspace</title>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,7 +28,7 @@
       </div>
       <button id="btn-reset" class="btn-secondary">Reset Code</button>
       <button id="btn-run" class="btn-secondary">Run / Preview</button>
-      <button id="btn-submit" class="btn-submit">
+      <button id="btn-submit" class="btn-submit" disabled>
         <span>Submit Code</span> &rarr;
       </button>
     </div>
@@ -67,7 +67,7 @@
         <div id="spec-image-wrapper" class="spec-image-wrapper" title="Click to enlarge target design spec">
           <img id="spec-image" class="spec-image" alt="Target Design Spec">
           <div class="spec-zoom-badge">
-            🔍 Click to Enlarge
+            Open reference
           </div>
         </div>
       </div>
@@ -128,6 +128,20 @@
     </div>
   </div>
 
+  <section id="grading-results" class="grading-results" aria-labelledby="grading-title" aria-live="polite" hidden>
+    <div class="grading-panel">
+      <p class="grading-eyebrow">AI Evaluation</p>
+      <h2 id="grading-title">Grading your submission...</h2>
+      <p id="grading-message" class="grading-message">Checking your code against the active challenge.</p>
+      <div id="grading-scores" class="grading-scores" hidden></div>
+      <div id="grading-reasoning" class="grading-reasoning" hidden></div>
+      <div class="grading-actions">
+        <button id="grading-back" class="btn-secondary">↑ Back to Challenge &amp; Code</button>
+        <button id="grading-retry" class="btn-secondary grading-retry" hidden>Grade Again</button>
+      </div>
+    </div>
+  </section>
+
   <!-- Enlargeable Image Lightbox Zoom Modal -->
   <div id="modal-overlay" class="modal-overlay">
     <div class="modal-content">
@@ -135,9 +149,9 @@
       <img id="modal-image" class="modal-image" alt="Target Design Spec Lightbox">
       
       <div class="modal-controls">
-        <button id="zoom-in" class="modal-btn">➕ Zoom In</button>
-        <button id="zoom-out" class="modal-btn">➖ Zoom Out</button>
-        <button id="zoom-reset" class="modal-btn">🔄 Reset</button>
+        <button id="zoom-in" class="modal-btn">Zoom in</button>
+        <button id="zoom-out" class="modal-btn">Zoom out</button>
+        <button id="zoom-reset" class="modal-btn">Reset</button>
       </div>
     </div>
   </div>
@@ -180,6 +194,7 @@
 
       const compilerEngine = new window.CodeCompilerEngine(editorManager);
       const specViewer = new window.SpecViewerManager(mode, activeSpec);
+      document.dispatchEvent(new CustomEvent('sandbox:spec-ready', { detail: activeSpec }));
 
       // Reset button handler
       const resetBtn = document.getElementById('btn-reset');

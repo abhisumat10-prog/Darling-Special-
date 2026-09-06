@@ -28,20 +28,23 @@ export default function FinalCTA() {
           Every build makes you a better frontend developer.
         </p>
         
-        <button className="group flex items-center gap-4 bg-[#ccff00] text-black px-10 py-5 font-mono text-sm tracking-widest font-bold uppercase transition-all hover:bg-white hover:scale-105">
+        <a
+          href="/sandbox.html?mode=challenge1"
+          className="group flex items-center gap-4 bg-[#ccff00] text-black px-10 py-5 font-mono text-sm tracking-widest font-bold uppercase transition-all hover:bg-white hover:scale-105"
+        >
           Start Your First Challenge
           <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-2" />
-        </button>
+        </a>
 
       </div>
 
       <footer className="mt-32 border-t border-neutral-900 pt-8 pb-12">
         <div className="container mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="font-mono text-xs tracking-widest font-bold uppercase text-white">
-            LC<span className="text-[#ccff00]">/</span>FE
+            Pixel<span className="text-[#ccff00]">Proof</span>
           </div>
           <div className="font-mono text-[10px] tracking-widest uppercase text-neutral-600">
-            © {new Date().getFullYear()} LeetCode for Frontend
+            © {new Date().getFullYear()} PixelProof
           </div>
         </div>
       </footer>
