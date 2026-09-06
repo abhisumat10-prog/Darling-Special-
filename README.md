@@ -1,4 +1,4 @@
-# Darling-Special: LeetCode for Frontend 🚀
+# Darling-Special: 
 
 An AI-powered platform for practicing real-world UI engineering. Build frontend components against real design specs and get automated feedback on visual fidelity, responsiveness, accessibility, and code quality.
 
@@ -48,16 +48,3 @@ Darling-Special-/
 
 ---
 
-## 🎯 Quick Starts for Each Teammate
-
-### For Person 1 (Editor & Sandbox)
-Load `challenges/challenges.json` into your challenge switcher. When a user selects a challenge, populate the editor with the corresponding `starter.html`.
-
-### For Person 2 (Scoring Track)
-Open each `reference.html` in your browser or headless runner at `1200px` (desktop) and `375px` (mobile) to capture reference screenshots for `pixelmatch`. When the user submits, send a POST request matching `contracts/grade-request.schema.json`.
-
-### For Person 3 (Backend API)
-Copy the system prompt from `prompts/grading-rubric-prompt.md` into your serverless function. Send the incoming payload to Claude 3.5 Sonnet / Haiku, and test your endpoint with `contracts/mocks/mock-grade-request.json`.
-
-### For Person 4 (Results UI)
-Import `contracts/mocks/mock-grade-response.json` into your component state. You can immediately build the score dials, letter grade badge, category progress bars, and expandable actionable feedback cards!
