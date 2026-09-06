@@ -49,6 +49,8 @@ app.post("/api/grade", async (req, res) => {
 Challenge brief: ${challengeBrief || "General UI challenge"}
 
 Grade on four signals: visual accuracy, responsive behavior, accessibility, and code quality.
+For code quality, evaluate both semantic correctness (right HTML elements, structure, maintainability)
+AND efficiency (unnecessary re-renders, redundant DOM queries, unoptimized loops, or other wasteful patterns).
 Decide the weight of each signal yourself based on what this specific challenge needs.
 
 Submitted code:
@@ -61,12 +63,22 @@ Visual diff score: ${visualDiffScore}/100
 Accessibility violations:
 ${JSON.stringify(a11yViolations, null, 2)}
 
+Calibrate your reasoning to the overall score level:
+- If overallScore is below 50: focus only on the most critical, foundational issues.
+  Don't overwhelm with minor details when core functionality or structure is broken.
+- If overallScore is 50-79: mention the 1-2 most important fixes, plus one or two
+  secondary improvements worth considering.
+- If overallScore is 80-99: focus on refinement and polish - edge cases,
+  minor accessibility improvements, or code elegance, since the fundamentals are solid.
+- If overallScore is 100: do not invent flaws. Acknowledge specifically what the
+  submission did well and confirm there are no meaningful issues to fix.
+
 Respond with ONLY valid JSON, no markdown, no preamble, in this exact shape:
 {
   "scores": { "visual": 0-100, "responsive": 0-100, "accessibility": 0-100, "codeQuality": 0-100 },
   "weights": { "visual": 0-1, "responsive": 0-1, "accessibility": 0-1, "codeQuality": 0-1 },
   "overallScore": 0-100,
-  "reasoning": "2-3 sentences explaining the weighting and the most important thing to fix"
+  "reasoning": "2-3 sentences explaining the weighting and either the most important thing to fix, or, if the score is excellent, what the submission did particularly well"
 }`;
 
     const response = await generateWithRetry(prompt);
