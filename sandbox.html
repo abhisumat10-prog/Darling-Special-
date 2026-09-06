@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frontend Sandbox Platform</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Sandbox Navigation Header -->
+  <header class="sandbox-header">
+    <a href="/" class="btn-back">
+      &larr; Back to Landing Page
+    </a>
+
+    <div class="challenge-title-header">
+      <span id="header-title">Loading Sandbox...</span>
+      <span id="mode-tag" class="mode-tag challenge">Challenge</span>
+    </div>
+
+    <div class="header-actions">
+      <div id="compiler-status" class="status-badge ready">
+        <span class="dot-indicator"></span> Ready
+      </div>
+      <button id="btn-reset" class="btn-secondary">Reset Code</button>
+      <button id="btn-run" class="btn-secondary">Run / Preview</button>
+      <button id="btn-submit" class="btn-submit">
+        <span>Submit Code</span> &rarr;
+      </button>
+    </div>
+  </header>
+
+  <!-- Sandbox Body Outer Layout (With Inset Screen Margins) -->
+  <div class="sandbox-layout">
+
+    <!-- Question Area (Top Pane) -->
+    <div id="question-pane" class="question-pane">
+      <div class="question-content">
+        <h2 id="question-title-body">Design Specification & Guidelines</h2>
+        <p id="question-description" class="question-description">
+          Loading challenge description...
+        </p>
+        <div id="requirements-list" class="requirements-list">
+          <!-- Requirements items dynamically injected -->
+        </div>
+      </div>
+
+      <!-- Question Visual Spec Image Container -->
+      <div class="question-spec-container">
+        <div class="spec-header">
+          <span>Target Visual Spec</span>
+          <div class="resize-controls">
+            <span>Height:</span>
+            <input type="range" id="resize-slider" class="resize-slider" min="180" max="450" value="250">
+          </div>
+        </div>
+        
+        <div id="spec-image-wrapper" class="spec-image-wrapper" title="Click to enlarge target design spec">
+          <img id="spec-image" class="spec-image" alt="Target Design Spec">
+          <div class="spec-zoom-badge">
+            🔍 Click to Enlarge
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workspace Split Pane (Left Editor + Right Output - Inset Cards Layout) -->
+    <div class="workspace-split">
+
+      <!-- Left Box: Code Editor -->
+      <div class="editor-box">
+        <div class="box-header">
+          <div class="editor-tabs">
+            <button class="tab-btn active" data-lang="html">
+              <span class="tab-icon">&lt;/&gt;</span> HTML
+            </button>
+            <button class="tab-btn" data-lang="css">
+              <span class="tab-icon">#</span> CSS
+            </button>
+            <button class="tab-btn" data-lang="js">
+              <span class="tab-icon">js</span> JavaScript
+            </button>
+          </div>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">Tab Size: 2 spaces</span>
+        </div>
+
+        <div class="editor-container">
+          <div class="code-textarea-wrapper">
+            <div id="line-numbers" class="line-numbers">
+              <!-- Line numbers dynamically populated -->
+            </div>
+            <textarea id="code-textarea" class="code-textarea" spellcheck="false" autocomplete="off"></textarea>
+          </div>
+        </div>
+
+        <!-- Compiler Line Error Banner (Displays syntax/compiler error details upon submit) -->
+        <div id="error-banner" class="error-banner"></div>
+      </div>
+
+      <!-- Right Box: Live Output Preview -->
+      <div class="output-box">
+        <div class="box-header">
+          <span style="font-size: 0.85rem; font-weight: 600; color: #fff;">
+            Live Preview Output
+          </span>
+
+          <div class="output-viewport-bar">
+            <button id="view-desktop" class="viewport-btn active">Desktop (100%)</button>
+            <button id="view-tablet" class="viewport-btn">Tablet (768px)</button>
+            <button id="view-mobile" class="viewport-btn">Mobile (375px)</button>
+          </div>
+        </div>
+
+        <div class="preview-container">
+          <iframe id="preview-iframe" class="preview-iframe" title="Component Live Preview" sandbox="allow-scripts allow-modals"></iframe>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Enlargeable Image Lightbox Zoom Modal -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal-content">
+      <button id="modal-close" class="modal-close-btn" title="Close Lightbox">&times;</button>
+      <img id="modal-image" class="modal-image" alt="Target Design Spec Lightbox">
+      
+      <div class="modal-controls">
+        <button id="zoom-in" class="modal-btn">➕ Zoom In</button>
+        <button id="zoom-out" class="modal-btn">➖ Zoom Out</button>
+        <button id="zoom-reset" class="modal-btn">🔄 Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script Modules -->
+  <script src="js/challenges.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/compiler.js"></script>
+  <script src="js/spec-viewer.js"></script>
+  <script src="js/integration-hooks.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Read sandbox mode from URL (?mode=tutorial or ?mode=challenge1)
+      const urlParams = new URLSearchParams(window.location.search);
+      const mode = urlParams.get('mode') === 'tutorial' ? 'tutorial' : 'challenge';
+
+      // Initialize modules with mode
+      const editorManager = new window.CodeEditorManager();
+      window.editorManagerInstance = editorManager;
+
+      const compilerEngine = new window.CodeCompilerEngine(editorManager);
+      const specViewer = new window.SpecViewerManager(mode);
+
+      // Reset button handler
+      const resetBtn = document.getElementById('btn-reset');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          const msg = mode === 'tutorial'
+            ? 'Reset tutorial playground code back to original Slider Pill UI template?'
+            : 'Reset Challenge #1 code back to original starter template and clear saved progress?';
+          if (confirm(msg)) {
+            editorManager.resetCode();
+            compilerEngine.compileAndSubmit(true);
+          }
+        });
+      }
+
+      // Viewport Switcher Handlers
+      const iframe = document.getElementById('preview-iframe');
+      const viewDesktop = document.getElementById('view-desktop');
+      const viewTablet = document.getElementById('view-tablet');
+      const viewMobile = document.getElementById('view-mobile');
+
+      const setViewport = (viewMode) => {
+        iframe.className = 'preview-iframe ' + (viewMode === 'desktop' ? '' : viewMode);
+        [viewDesktop, viewTablet, viewMobile].forEach(btn => btn.classList.remove('active'));
+        if (viewMode === 'desktop') viewDesktop.classList.add('active');
+        if (viewMode === 'tablet') viewTablet.classList.add('active');
+        if (viewMode === 'mobile') viewMobile.classList.add('active');
+      };
+
+      viewDesktop.addEventListener('click', () => setViewport('desktop'));
+      viewTablet.addEventListener('click', () => setViewport('tablet'));
+      viewMobile.addEventListener('click', () => setViewport('mobile'));
+    });
+  </script>
+
+</body>
+</html>
