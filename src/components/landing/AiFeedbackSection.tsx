@@ -15,14 +15,15 @@ function FeedbackItem({
   index: number,
   isWarning?: boolean
 }) {
-  const start = 0.2 + (index * 0.1);
-  const opacity = useTransform(progress, [start, start + 0.1], [0, 1]);
-  const x = useTransform(progress, [start, start + 0.1], [-20, 0]);
+  // Items reveal early and smoothly: starting from 0.05 to 0.45
+  const start = 0.05 + (index * 0.08);
+  const opacity = useTransform(progress, [start, start + 0.08], [0.15, 1]);
+  const x = useTransform(progress, [start, start + 0.08], [-12, 0]);
 
   return (
     <motion.div 
       style={{ opacity, x }} 
-      className="flex items-start gap-4 p-4 border border-neutral-900 bg-[#080909]"
+      className="flex items-start gap-4 p-3.5 border border-neutral-900 bg-[#080909]"
     >
       <Icon className={`w-5 h-5 mt-0.5 shrink-0 ${isWarning ? 'text-yellow-500' : 'text-[#ccff00]'}`} />
       <p className="text-neutral-300 text-sm leading-relaxed">{text}</p>
@@ -38,17 +39,23 @@ export default function AiFeedbackSection() {
     offset: ["start start", "end end"]
   });
 
-  const panelOpacity = useTransform(scrollYProgress, [0, 0.1], [0, 1]);
-  const panelY = useTransform(scrollYProgress, [0, 0.1], [50, 0]);
+  // The panel frame and typography are already clearly visible as soon as section pins
+  const panelOpacity = useTransform(scrollYProgress, [0, 0.06], [0.85, 1]);
+  const panelY = useTransform(scrollYProgress, [0, 0.08], [15, 0]);
 
-  const thumbsOpacity = useTransform(scrollYProgress, [0.8, 0.9], [0, 1]);
+  // Thumbnails appear naturally right after the list items (~0.45 to 0.65)
+  const thumbsOpacity = useTransform(scrollYProgress, [0.45, 0.60], [0, 1]);
+  const thumbsY = useTransform(scrollYProgress, [0.45, 0.60], [10, 0]);
+
+  // Exit transition into CTA seamlessly
+  const exitOpacity = useTransform(scrollYProgress, [0.85, 1], [1, 0.3]);
 
   return (
-    <section ref={containerRef} className="relative h-[300vh] bg-[#050606] border-t border-neutral-900">
+    <section ref={containerRef} className="relative h-[200vh] bg-[#050606] border-t border-neutral-900">
       <div className="sticky top-0 h-screen flex flex-col md:flex-row items-center justify-center gap-12 px-6 bg-grain">
         
         {/* Left: Typography */}
-        <div className="w-full md:w-1/3 flex flex-col items-start z-10">
+        <motion.div style={{ opacity: exitOpacity }} className="w-full md:w-1/3 flex flex-col items-start z-10">
           <div className="flex items-center gap-3 mb-6">
             <span className="font-mono text-xs tracking-[0.2em] uppercase text-[#ccff00]">05 // Feedback</span>
           </div>
@@ -56,7 +63,7 @@ export default function AiFeedbackSection() {
             Detailed<br />Feedback.<br />
             <span className="text-neutral-600">Real<br />Improvement.</span>
           </h2>
-        </div>
+        </motion.div>
 
         {/* Right: AI Panel */}
         <div className="w-full md:w-1/2 max-w-xl z-20">
@@ -74,7 +81,7 @@ export default function AiFeedbackSection() {
             </div>
 
             {/* List */}
-            <div className="flex flex-col gap-3 mb-8">
+            <div className="flex flex-col gap-2.5 mb-6">
               <FeedbackItem 
                 icon={CheckCircle2} 
                 text="Overall layout matches the reference closely. The grid structure is precise." 
@@ -111,8 +118,8 @@ export default function AiFeedbackSection() {
 
             {/* Thumbnails */}
             <motion.div 
-              style={{ opacity: thumbsOpacity }}
-              className="flex gap-4 pt-6 border-t border-neutral-900"
+              style={{ opacity: thumbsOpacity, y: thumbsY }}
+              className="flex gap-4 pt-4 border-t border-neutral-900"
             >
               <div className="flex-1">
                 <span className="block font-mono text-[9px] tracking-widest uppercase text-neutral-500 mb-2">Reference</span>
