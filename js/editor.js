@@ -18,7 +18,7 @@ class CodeEditorManager {
     this.modeParam = urlParams.get('mode') || 'challenge1';
     this.mode = this.modeParam === 'tutorial' ? 'tutorial' : 'challenge';
     this.challengeSpec = window.ACTIVE_SANDBOX_SPEC || window.CHALLENGE_1_SPEC;
-    this.storageKey = `${this.challengeSpec.id}_v2_saved_code`;
+    this.storageKey = `${this.challengeSpec.id}_v4_saved_code`;
     this.hasUnsubmittedEdits = false;
 
     this.textarea = document.getElementById('code-textarea');

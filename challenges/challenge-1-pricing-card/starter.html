@@ -33,5 +33,15 @@
     <p>$49 / user / month</p>
     <button>Start Trial</button>
   </div>
+
+  <script>
+    const trialButton = document.querySelector('.pricing-card button');
+
+    trialButton.addEventListener('click', () => {
+      trialButton.textContent = 'Trial Started';
+      trialButton.disabled = true;
+      trialButton.setAttribute('aria-label', 'Free trial started');
+    });
+  </script>
 </body>
 </html>

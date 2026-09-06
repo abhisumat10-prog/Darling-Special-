@@ -56,5 +56,41 @@
       </div>
     </div>
   </div>
+
+  <script>
+    const overlay = document.querySelector('.modal-overlay');
+    const dialog = document.querySelector('.modal-box');
+    const buttons = Array.from(dialog.querySelectorAll('button'));
+    const cancelButton = buttons.find(button => button.textContent.trim() === 'Cancel');
+    const confirmButton = buttons.find(button => button.textContent.trim() === 'Confirm');
+    const previouslyFocused = document.activeElement;
+
+    function closeModal() {
+      overlay.style.display = 'none';
+      if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus();
+    }
+
+    cancelButton.addEventListener('click', closeModal);
+    confirmButton.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && overlay.style.display !== 'none') closeModal();
+
+      if (event.key === 'Tab' && overlay.style.display !== 'none') {
+        const firstButton = buttons[0];
+        const lastButton = buttons[buttons.length - 1];
+
+        if (event.shiftKey && document.activeElement === firstButton) {
+          event.preventDefault();
+          lastButton.focus();
+        } else if (!event.shiftKey && document.activeElement === lastButton) {
+          event.preventDefault();
+          firstButton.focus();
+        }
+      }
+    });
+
+    cancelButton.focus();
+  </script>
 </body>
 </html>
