@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
+import { ArrowRight } from 'lucide-react';
 
 export default function ChallengeSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -29,9 +30,20 @@ export default function ChallengeSection() {
             <span className="text-neutral-600">Real Challenges.</span>
           </h2>
           
-          <p className="text-xl text-neutral-400 font-body border-l border-neutral-800 pl-6">
+          <p className="text-xl text-neutral-400 font-body border-l border-neutral-800 pl-6 mb-8">
             Recreate modern interfaces from real-world design specifications. Build pixel-perfect SaaS dashboards, immersive e-commerce pages, and complex interactive components.
           </p>
+
+          {/* Button directing to 1st Challenge Sandbox */}
+          <div className="pl-6">
+            <a 
+              href="/sandbox.html?mode=challenge1" 
+              className="inline-flex items-center gap-3 bg-[#ccff00] text-black px-8 py-4 font-mono text-sm tracking-widest font-bold uppercase transition-all hover:bg-white hover:scale-105 pointer-events-auto"
+            >
+              Start 1st Challenge
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
         </div>
 
       </div>
