@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Autocomplete Challenge</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f8fafc;
+      padding: 40px 20px;
+    }
+
+    .combobox-wrapper {
+      max-width: 480px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* 
+      TODO: Style the input field, search icon, and dropdown list:
+      - Clean focus ring with offset
+      - Absolute positioned dropdown with shadow
+      - Highlight matched text with background color
+    */
+    .combobox-input {
+      width: 100%;
+      height: 44px;
+      padding: 8px 12px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 
+    TODO: Implement WAI-ARIA Combobox pattern:
+    - input role="combobox", aria-autocomplete="list", aria-expanded="false"
+    - ul role="listbox", li role="option"
+    - ArrowUp, ArrowDown, Enter, and Escape keyboard navigation
+  -->
+  <div class="combobox-wrapper">
+    <label for="techSearch">Search Technologies</label>
+    <input type="text" id="techSearch" class="combobox-input" placeholder="Type to search..." />
+    <ul id="resultsList" class="dropdown-list"></ul>
+  </div>
+
+  <script>
+    const DATA = ["React", "Next.js", "Vue.js", "Tailwind CSS", "TypeScript", "Svelte", "Redux", "Vite"];
+    // TODO: Implement filtering, keyboard traversal, and match highlighting
+  </script>
+</body>
+</html>

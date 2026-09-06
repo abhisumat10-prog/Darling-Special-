@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Challenge 6 - Reference: Sortable Data Table</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .table-card {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    /* Toolbar Header */
+    .table-toolbar {
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid #e2e8f0;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .search-input {
+      height: 40px;
+      padding: 0 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      width: 260px;
+      max-width: 100%;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .search-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    /* Table Container for horizontal scrolling */
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    caption {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    thead {
+      background-color: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+      padding: 12px 24px;
+      font-weight: 600;
+      color: #475569;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    th button {
+      background: none;
+      border: none;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 0;
+    }
+
+    th button:hover {
+      color: #0f172a;
+    }
+
+    .sort-icon {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      opacity: 0.4;
+    }
+
+    th[aria-sort="ascending"] .sort-icon,
+    th[aria-sort="descending"] .sort-icon {
+      opacity: 1;
+      color: #2563eb;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #f1f5f9;
+      transition: background-color 0.1s;
+    }
+
+    tbody tr:hover {
+      background-color: #f8fafc;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    td {
+      padding: 16px 24px;
+      color: #334155;
+      white-space: nowrap;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-name {
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .user-email {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-active {
+      background-color: #ecfdf5;
+      color: #047857;
+    }
+
+    .badge-pending {
+      background-color: #fffbeb;
+      color: #b45309;
+    }
+
+    .badge-offline {
+      background-color: #f1f5f9;
+      color: #475569;
+    }
+
+    /* Pagination Footer */
+    .table-footer {
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #e2e8f0;
+      background-color: #ffffff;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .pagination-info {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .page-btn {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      background-color: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="table-card">
+    <div class="table-toolbar">
+      <h2 class="toolbar-title">Team Directory</h2>
+      <input 
+        type="search" 
+        id="tableSearch" 
+        class="search-input" 
+        placeholder="Filter by name or email..." 
+        aria-label="Filter team members"
+      />
+    </div>
+
+    <div class="table-responsive">
+      <table aria-describedby="tableInfo">
+        <caption>Directory of current engineering team members and account statuses</caption>
+        <thead>
+          <tr>
+            <th scope="col" id="colName" aria-sort="none">
+              <button type="button" onclick="handleSort('name')">
+                <span>Member</span>
+                <svg class="sort-icon" viewBox="0 0 24 24"><path d="M7 15l5 5 5-5M7 9l5-5 5 5"/></svg>
+              </button>
+            </th>
+            <th scope="col" id="colRole" aria-sort="none">
+              <button type="button" onclick="handleSort('role')">
+                <span>Role</span>
+                <svg class="sort-icon" viewBox="0 0 24 24"><path d="M7 15l5 5 5-5M7 9l5-5 5 5"/></svg>
+              </button>
+            </th>
+            <th scope="col" id="colDepartment">Department</th>
+            <th scope="col" id="colStatus" aria-sort="none">
+              <button type="button" onclick="handleSort('status')">
+                <span>Status</span>
+                <svg class="sort-icon" viewBox="0 0 24 24"><path d="M7 15l5 5 5-5M7 9l5-5 5 5"/></svg>
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span class="pagination-info" id="tableInfo">Showing 1-5 of 10</span>
+      <div class="pagination-controls">
+        <button type="button" class="page-btn" id="prevBtn" onclick="changePage(-1)" disabled>Previous</button>
+        <button type="button" class="page-btn" id="nextBtn" onclick="changePage(1)">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const MEMBERS = [
+      { name: "Alex Rivera", email: "alex@team.com", role: "Staff Engineer", dept: "Core UI", status: "Active" },
+      { name: "Beatriz Santos", email: "beatriz@team.com", role: "Product Designer", dept: "Design Systems", status: "Active" },
+      { name: "Chloe Bennett", email: "chloe@team.com", role: "Frontend Dev", dept: "Growth", status: "Pending" },
+      { name: "David Kim", email: "david@team.com", role: "Engineering Lead", dept: "Infrastructure", status: "Active" },
+      { name: "Elena Rostova", email: "elena@team.com", role: "QA Engineer", dept: "Reliability", status: "Offline" },
+      { name: "Farhan Malik", email: "farhan@team.com", role: "Fullstack Dev", dept: "Core UI", status: "Active" },
+      { name: "Grace Hopper", email: "grace@team.com", role: "Compiler Specialist", dept: "Architecture", status: "Active" },
+      { name: "Henry Chen", email: "henry@team.com", role: "Frontend Intern", dept: "Growth", status: "Pending" },
+      { name: "Isla Stewart", email: "isla@team.com", role: "Accessibility Lead", dept: "Design Systems", status: "Active" },
+      { name: "Jack Wilson", email: "jack@team.com", role: "DevOps Engineer", dept: "Infrastructure", status: "Offline" }
+    ];
+
+    let currentSort = { col: null, direction: 'none' };
+    let searchQuery = "";
+    let currentPage = 1;
+    const pageSize = 5;
+
+    function handleSort(columnKey) {
+      if (currentSort.col === columnKey) {
+        currentSort.direction = currentSort.direction === 'ascending' ? 'descending' : (currentSort.direction === 'descending' ? 'none' : 'ascending');
+      } else {
+        currentSort.col = columnKey;
+        currentSort.direction = 'ascending';
+      }
+
+      ['colName', 'colRole', 'colStatus'].forEach(id => {
+        document.getElementById(id).setAttribute('aria-sort', 'none');
+      });
+
+      if (currentSort.direction !== 'none') {
+        const activeHeaderId = columnKey === 'name' ? 'colName' : (columnKey === 'role' ? 'colRole' : 'colStatus');
+        document.getElementById(activeHeaderId).setAttribute('aria-sort', currentSort.direction);
+      }
+
+      renderTable();
+    }
+
+    function renderTable() {
+      let filtered = MEMBERS.filter(m => 
+        m.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        m.email.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      if (currentSort.direction !== 'none' && currentSort.col) {
+        filtered.sort((a, b) => {
+          const valA = a[currentSort.col].toLowerCase();
+          const valB = b[currentSort.col].toLowerCase();
+          if (valA < valB) return currentSort.direction === 'ascending' ? -1 : 1;
+          if (valA > valB) return currentSort.direction === 'ascending' ? 1 : -1;
+          return 0;
+        });
+      }
+
+      const totalItems = filtered.length;
+      const totalPages = Math.ceil(totalItems / pageSize) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIndex = (currentPage - 1) * pageSize;
+      const paginated = filtered.slice(startIndex, startIndex + pageSize);
+
+      const tbody = document.getElementById("tableBody");
+      tbody.innerHTML = paginated.map(m => {
+        const badgeClass = m.status === 'Active' ? 'badge-active' : (m.status === 'Pending' ? 'badge-pending' : 'badge-offline');
+        return `
+          <tr>
+            <td>
+              <div class="user-info">
+                <span class="user-name">${m.name}</span>
+                <span class="user-email">${m.email}</span>
+              </div>
+            </td>
+            <td>${m.role}</td>
+            <td>${m.dept}</td>
+            <td><span class="badge ${badgeClass}">${m.status}</span></td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById("tableInfo").textContent = totalItems === 0 ? "No results found" : `Showing ${startIndex + 1}-${Math.min(startIndex + pageSize, totalItems)} of ${totalItems}`;
+      document.getElementById("prevBtn").disabled = currentPage <= 1;
+      document.getElementById("nextBtn").disabled = currentPage >= totalPages;
+    }
+
+    function changePage(delta) {
+      currentPage += delta;
+      renderTable();
+    }
+
+    document.getElementById("tableSearch").addEventListener("input", (e) => {
+      searchQuery = e.target.value.trim();
+      currentPage = 1;
+      renderTable();
+    });
+
+    renderTable();
+  </script>
+</body>
+</html>

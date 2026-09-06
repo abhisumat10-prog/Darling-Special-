@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Challenge 4 - Reference: Search Autocomplete</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .combobox-wrapper {
+      max-width: 480px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 8px;
+    }
+
+    .input-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      width: 18px;
+      height: 18px;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+
+    .combobox-input {
+      width: 100%;
+      height: 48px;
+      padding: 0 40px 0 42px;
+      font-size: 15px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background-color: #ffffff;
+      color: #0f172a;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .combobox-input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #94a3b8;
+      display: none;
+      padding: 4px;
+      border-radius: 4px;
+    }
+
+    .clear-btn:hover {
+      color: #475569;
+    }
+
+    .clear-btn.is-visible {
+      display: flex;
+    }
+
+    .dropdown-list {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+      max-height: 280px;
+      overflow-y: auto;
+      list-style: none;
+      z-index: 50;
+      display: none;
+    }
+
+    .dropdown-list.is-open {
+      display: block;
+    }
+
+    .dropdown-item {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.1s;
+      border-left: 3px solid transparent;
+    }
+
+    .dropdown-item:hover,
+    .dropdown-item.is-selected {
+      background-color: #f1f5f9;
+      border-left-color: #2563eb;
+    }
+
+    .item-highlight {
+      background-color: #dbeafe;
+      color: #1d4ed8;
+      font-weight: 600;
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+
+    .item-category {
+      font-size: 12px;
+      color: #64748b;
+      background-color: #f1f5f9;
+      padding: 2px 8px;
+      border-radius: 9999px;
+    }
+
+    .empty-state {
+      padding: 20px 16px;
+      text-align: center;
+      font-size: 14px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <div class="combobox-wrapper">
+    <label for="techSearch" id="comboboxLabel" class="label">Search Frontend Libraries & Tools</label>
+    
+    <div class="input-container">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input
+        type="text"
+        id="techSearch"
+        class="combobox-input"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded="false"
+        aria-controls="resultsList"
+        aria-labelledby="comboboxLabel"
+        placeholder="Try 'React', 'Tailwind', 'Next.js'..."
+        autocomplete="off"
+      />
+      <button type="button" id="clearBtn" class="clear-btn" aria-label="Clear search query">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <ul id="resultsList" class="dropdown-list" role="listbox" aria-labelledby="comboboxLabel"></ul>
+  </div>
+
+  <script>
+    const DATA = [
+      { name: "React", category: "UI Library" },
+      { name: "Next.js", category: "Framework" },
+      { name: "Vue.js", category: "Framework" },
+      { name: "Nuxt", category: "Framework" },
+      { name: "Tailwind CSS", category: "Styling" },
+      { name: "TypeScript", category: "Language" },
+      { name: "Svelte", category: "Compiler" },
+      { name: "Astro", category: "Site Builder" },
+      { name: "Redux Toolkit", category: "State" },
+      { name: "Zustand", category: "State" },
+      { name: "Vite", category: "Build Tool" }
+    ];
+
+    const input = document.getElementById("techSearch");
+    const list = document.getElementById("resultsList");
+    const clearBtn = document.getElementById("clearBtn");
+
+    let activeIndex = -1;
+    let filteredItems = [];
+
+    function highlightText(text, query) {
+      if (!query) return text;
+      const regex = new RegExp(`(${query})`, "gi");
+      return text.replace(regex, `<span class="item-highlight">$1</span>`);
+    }
+
+    function renderList(query) {
+      filteredItems = DATA.filter(item => 
+        item.name.toLowerCase().includes(query.toLowerCase())
+      );
+
+      list.innerHTML = "";
+      activeIndex = -1;
+      input.removeAttribute("aria-activedescendant");
+
+      if (filteredItems.length === 0) {
+        list.innerHTML = `<div class="empty-state" role="status">No matching results found</div>`;
+        list.classList.add("is-open");
+        input.setAttribute("aria-expanded", "true");
+        return;
+      }
+
+      filteredItems.forEach((item, index) => {
+        const li = document.createElement("li");
+        li.className = "dropdown-item";
+        li.id = `option-${index}`;
+        li.setAttribute("role", "option");
+        li.setAttribute("aria-selected", "false");
+        li.innerHTML = `
+          <span>${highlightText(item.name, query)}</span>
+          <span class="item-category">${item.category}</span>
+        `;
+        li.addEventListener("click", () => selectOption(item.name));
+        list.appendChild(li);
+      });
+
+      list.classList.add("is-open");
+      input.setAttribute("aria-expanded", "true");
+    }
+
+    function selectOption(value) {
+      input.value = value;
+      list.classList.remove("is-open");
+      input.setAttribute("aria-expanded", "false");
+      clearBtn.classList.add("is-visible");
+      input.focus();
+    }
+
+    function updateActiveOption() {
+      const items = list.querySelectorAll(".dropdown-item");
+      items.forEach((item, idx) => {
+        if (idx === activeIndex) {
+          item.classList.add("is-selected");
+          item.setAttribute("aria-selected", "true");
+          input.setAttribute("aria-activedescendant", item.id);
+          item.scrollIntoView({ block: "nearest" });
+        } else {
+          item.classList.remove("is-selected");
+          item.setAttribute("aria-selected", "false");
+        }
+      });
+    }
+
+    input.addEventListener("input", (e) => {
+      const query = e.target.value.trim();
+      clearBtn.classList.toggle("is-visible", query.length > 0);
+      if (query.length > 0) {
+        renderList(query);
+      } else {
+        list.classList.remove("is-open");
+        input.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    input.addEventListener("keydown", (e) => {
+      const isOpen = list.classList.contains("is-open");
+      const items = list.querySelectorAll(".dropdown-item");
+
+      if (!isOpen || items.length === 0) return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        activeIndex = (activeIndex + 1) % items.length;
+        updateActiveOption();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        activeIndex = (activeIndex - 1 + items.length) % items.length;
+        updateActiveOption();
+      } else if (e.key === "Enter" && activeIndex >= 0) {
+        e.preventDefault();
+        selectOption(filteredItems[activeIndex].name);
+      } else if (e.key === "Escape") {
+        list.classList.remove("is-open");
+        input.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    clearBtn.addEventListener("click", () => {
+      input.value = "";
+      clearBtn.classList.remove("is-visible");
+      list.classList.remove("is-open");
+      input.setAttribute("aria-expanded", "false");
+      input.focus();
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".combobox-wrapper")) {
+        list.classList.remove("is-open");
+        input.setAttribute("aria-expanded", "false");
+      }
+    });
+  </script>
+</body>
+</html>

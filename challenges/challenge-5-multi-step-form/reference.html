@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Challenge 5 - Reference: Multi-Step Form Wizard</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      min-height: 100vh;
+      padding: 40px 16px;
+    }
+
+    .wizard-card {
+      max-width: 560px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 36px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Stepper Bar */
+    .stepper-nav {
+      margin-bottom: 32px;
+    }
+
+    .stepper-list {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      list-style: none;
+      position: relative;
+    }
+
+    .stepper-list::before {
+      content: "";
+      position: absolute;
+      top: 18px;
+      left: 36px;
+      right: 36px;
+      height: 2px;
+      background: #e2e8f0;
+      z-index: 1;
+    }
+
+    .stepper-step {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid #cbd5e1;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .step-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+    }
+
+    .stepper-step.is-active .step-circle {
+      border-color: #2563eb;
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    .stepper-step.is-active .step-label {
+      color: #2563eb;
+    }
+
+    .stepper-step.is-completed .step-circle {
+      border-color: #10b981;
+      background: #10b981;
+      color: #ffffff;
+    }
+
+    /* Form Fields */
+    .step-panel {
+      display: none;
+    }
+
+    .step-panel.is-visible {
+      display: block;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    fieldset {
+      border: none;
+    }
+
+    legend {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .step-subtitle {
+      font-size: 14px;
+      color: #64748b;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      height: 44px;
+      padding: 0 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 15px;
+      color: #0f172a;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .form-input.has-error, .form-select.has-error {
+      border-color: #ef4444;
+    }
+
+    .error-msg {
+      display: none;
+      font-size: 13px;
+      color: #ef4444;
+      margin-top: 6px;
+    }
+
+    .error-msg.is-visible {
+      display: block;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .checkbox-group input {
+      margin-top: 3px;
+      width: 16px;
+      height: 16px;
+      accent-color: #2563eb;
+    }
+
+    /* Actions */
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .btn {
+      padding: 10px 22px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #ffffff;
+      margin-left: auto;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      color: #475569;
+    }
+
+    .btn-secondary:hover {
+      background: #f8fafc;
+    }
+
+    /* Summary Card */
+    .summary-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+
+    .summary-label {
+      color: #64748b;
+    }
+
+    .summary-value {
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    @media (max-width: 640px) {
+      .wizard-card {
+        padding: 24px 16px;
+      }
+      .step-label {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wizard-card">
+    <nav class="stepper-nav" aria-label="Registration Progress">
+      <ol class="stepper-list">
+        <li class="stepper-step is-active" id="step-ind-1" aria-current="step">
+          <div class="step-circle">1</div>
+          <span class="step-label">Account</span>
+        </li>
+        <li class="stepper-step" id="step-ind-2">
+          <div class="step-circle">2</div>
+          <span class="step-label">Company</span>
+        </li>
+        <li class="stepper-step" id="step-ind-3">
+          <div class="step-circle">3</div>
+          <span class="step-label">Review</span>
+        </li>
+      </ol>
+    </nav>
+
+    <form id="wizardForm" novalidate>
+      <!-- Step 1 -->
+      <section class="step-panel is-visible" id="stepPanel1">
+        <fieldset>
+          <legend>Account Details</legend>
+          <p class="step-subtitle">Start by introducing yourself.</p>
+
+          <div class="form-group">
+            <label for="fullName" class="form-label">Full Name</label>
+            <input type="text" id="fullName" class="form-input" placeholder="Sarah Connor" required aria-describedby="fullNameError" />
+            <div id="fullNameError" class="error-msg" role="alert">Please enter your full name (at least 2 characters).</div>
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">Work Email</label>
+            <input type="email" id="email" class="form-input" placeholder="sarah@company.com" required aria-describedby="emailError" />
+            <div id="emailError" class="error-msg" role="alert">Please provide a valid work email address.</div>
+          </div>
+        </fieldset>
+      </section>
+
+      <!-- Step 2 -->
+      <section class="step-panel" id="stepPanel2">
+        <fieldset>
+          <legend>Company Information</legend>
+          <p class="step-subtitle">Tell us about your organization.</p>
+
+          <div class="form-group">
+            <label for="companyName" class="form-label">Company Name</label>
+            <input type="text" id="companyName" class="form-input" placeholder="Acme Systems" required aria-describedby="companyNameError" />
+            <div id="companyNameError" class="error-msg" role="alert">Company name is required.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="companySize" class="form-label">Team Size</label>
+            <select id="companySize" class="form-select" required aria-describedby="companySizeError">
+              <option value="">Select company size...</option>
+              <option value="1-10">1-10 employees</option>
+              <option value="11-50">11-50 employees</option>
+              <option value="51-200">51-200 employees</option>
+              <option value="200+">200+ employees</option>
+            </select>
+            <div id="companySizeError" class="error-msg" role="alert">Please select your team size.</div>
+          </div>
+
+          <div class="checkbox-group">
+            <input type="checkbox" id="terms" required aria-describedby="termsError" />
+            <label for="terms" class="form-label" style="margin:0; font-weight: 500;">I accept the terms and conditions</label>
+          </div>
+          <div id="termsError" class="error-msg" role="alert">You must accept the terms to continue.</div>
+        </fieldset>
+      </section>
+
+      <!-- Step 3 -->
+      <section class="step-panel" id="stepPanel3">
+        <fieldset>
+          <legend>Review & Confirm</legend>
+          <p class="step-subtitle">Verify your details before submitting.</p>
+
+          <div class="summary-box">
+            <div class="summary-row">
+              <span class="summary-label">Name</span>
+              <span class="summary-value" id="reviewName">-</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Email</span>
+              <span class="summary-value" id="reviewEmail">-</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Company</span>
+              <span class="summary-value" id="reviewCompany">-</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Team Size</span>
+              <span class="summary-value" id="reviewSize">-</span>
+            </div>
+          </div>
+        </fieldset>
+      </section>
+
+      <!-- Navigation Buttons -->
+      <div class="button-row">
+        <button type="button" class="btn btn-secondary" id="backBtn" style="display: none;">Back</button>
+        <button type="button" class="btn btn-primary" id="nextBtn">Next Step</button>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    let currentStep = 1;
+    const totalSteps = 3;
+
+    const panels = [
+      document.getElementById("stepPanel1"),
+      document.getElementById("stepPanel2"),
+      document.getElementById("stepPanel3")
+    ];
+
+    const indicators = [
+      document.getElementById("step-ind-1"),
+      document.getElementById("step-ind-2"),
+      document.getElementById("step-ind-3")
+    ];
+
+    const nextBtn = document.getElementById("nextBtn");
+    const backBtn = document.getElementById("backBtn");
+
+    function validateStep(step) {
+      let isValid = true;
+      if (step === 1) {
+        const name = document.getElementById("fullName");
+        const nameErr = document.getElementById("fullNameError");
+        if (name.value.trim().length < 2) {
+          name.classList.add("has-error");
+          name.setAttribute("aria-invalid", "true");
+          nameErr.classList.add("is-visible");
+          isValid = false;
+        } else {
+          name.classList.remove("has-error");
+          name.setAttribute("aria-invalid", "false");
+          nameErr.classList.remove("is-visible");
+        }
+
+        const email = document.getElementById("email");
+        const emailErr = document.getElementById("emailError");
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email.value.trim())) {
+          email.classList.add("has-error");
+          email.setAttribute("aria-invalid", "true");
+          emailErr.classList.add("is-visible");
+          isValid = false;
+        } else {
+          email.classList.remove("has-error");
+          email.setAttribute("aria-invalid", "false");
+          emailErr.classList.remove("is-visible");
+        }
+      } else if (step === 2) {
+        const comp = document.getElementById("companyName");
+        const compErr = document.getElementById("companyNameError");
+        if (!comp.value.trim()) {
+          comp.classList.add("has-error");
+          comp.setAttribute("aria-invalid", "true");
+          compErr.classList.add("is-visible");
+          isValid = false;
+        } else {
+          comp.classList.remove("has-error");
+          comp.setAttribute("aria-invalid", "false");
+          compErr.classList.remove("is-visible");
+        }
+
+        const size = document.getElementById("companySize");
+        const sizeErr = document.getElementById("companySizeError");
+        if (!size.value) {
+          size.classList.add("has-error");
+          size.setAttribute("aria-invalid", "true");
+          sizeErr.classList.add("is-visible");
+          isValid = false;
+        } else {
+          size.classList.remove("has-error");
+          size.setAttribute("aria-invalid", "false");
+          sizeErr.classList.remove("is-visible");
+        }
+
+        const terms = document.getElementById("terms");
+        const termsErr = document.getElementById("termsError");
+        if (!terms.checked) {
+          termsErr.classList.add("is-visible");
+          isValid = false;
+        } else {
+          termsErr.classList.remove("is-visible");
+        }
+      }
+      return isValid;
+    }
+
+    function renderStep() {
+      panels.forEach((p, idx) => {
+        p.classList.toggle("is-visible", idx === currentStep - 1);
+      });
+
+      indicators.forEach((ind, idx) => {
+        ind.classList.remove("is-active", "is-completed");
+        ind.removeAttribute("aria-current");
+        if (idx === currentStep - 1) {
+          ind.classList.add("is-active");
+          ind.setAttribute("aria-current", "step");
+        } else if (idx < currentStep - 1) {
+          ind.classList.add("is-completed");
+        }
+      });
+
+      backBtn.style.display = currentStep > 1 ? "block" : "none";
+      nextBtn.textContent = currentStep === totalSteps ? "Confirm & Submit" : "Next Step";
+
+      if (currentStep === 3) {
+        document.getElementById("reviewName").textContent = document.getElementById("fullName").value;
+        document.getElementById("reviewEmail").textContent = document.getElementById("email").value;
+        document.getElementById("reviewCompany").textContent = document.getElementById("companyName").value;
+        document.getElementById("reviewSize").textContent = document.getElementById("companySize").value;
+      }
+    }
+
+    nextBtn.addEventListener("click", () => {
+      if (currentStep < totalSteps) {
+        if (validateStep(currentStep)) {
+          currentStep++;
+          renderStep();
+        }
+      } else {
+        nextBtn.textContent = "Submitting...";
+        nextBtn.disabled = true;
+        setTimeout(() => {
+          alert("Registration submitted successfully!");
+        }, 600);
+      }
+    });
+
+    backBtn.addEventListener("click", () => {
+      if (currentStep > 1) {
+        currentStep--;
+        renderStep();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sortable Data Table Challenge</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f8fafc;
+      padding: 40px 20px;
+    }
+
+    .table-card {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* 
+      TODO: Style the search bar, sortable table, and pagination controls:
+      - Clean table border collapse, hover rows, and padding
+      - Sort direction indicator arrows in headers
+      - Responsive horizontal scroll wrapper
+    */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+  </style>
+</head>
+<body>
+  <!-- 
+    TODO: Build an accessible data table:
+    - Proper <table>, <thead>, <tbody>, <th>, <td> tags
+    - aria-sort attributes ("ascending" | "descending" | "none") on interactive headers
+    - Live search input filter
+    - 5-item pagination with disabled previous/next controls
+  -->
+  <div class="table-card">
+    <input type="text" id="search" placeholder="Filter members..." />
+    <table>
+      <thead>
+        <tr>
+          <th>Member</th>
+          <th>Role</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    // TODO: Implement sorting, keyword filtering, and pagination
+  </script>
+</body>
+</html>
