@@ -4,8 +4,9 @@
  */
 
 class SpecViewerManager {
-  constructor(mode = 'challenge') {
+  constructor(mode = 'challenge', challenge = null) {
     this.mode = mode;
+    this.challenge = challenge;
     this.specImageWrapper = document.getElementById('spec-image-wrapper');
     this.specImage = document.getElementById('spec-image');
     this.resizeSlider = document.getElementById('resize-slider');
@@ -24,9 +25,9 @@ class SpecViewerManager {
 
   init() {
     // Select spec object according to mode
-    const specData = this.mode === 'tutorial' 
-      ? window.TUTORIAL_SPEC 
-      : window.CHALLENGE_1_SPEC;
+    const specData = this.challenge || (this.mode === 'tutorial'
+      ? window.TUTORIAL_SPEC
+      : window.ACTIVE_SANDBOX_SPEC || window.CHALLENGE_1_SPEC);
 
     if (specData) {
       this.loadChallengeData(specData);
@@ -102,15 +103,38 @@ class SpecViewerManager {
     }
 
     if (reqListEl && challenge.requirements) {
-      reqListEl.innerHTML = challenge.requirements
-        .map(req => `<div class="requirement-item">📌 ${req}</div>`)
-        .join('');
+      reqListEl.replaceChildren(...challenge.requirements.map(requirement => {
+        const item = document.createElement('div');
+        item.className = 'requirement-item';
+        item.textContent = `📌 ${requirement}`;
+        return item;
+      }));
     }
 
     if (this.specImage && challenge.specImageSvg) {
       this.specImage.src = challenge.specImageSvg;
       if (this.modalImage) {
         this.modalImage.src = challenge.specImageSvg;
+      }
+    }
+
+    if (this.specImage && challenge.referencePath) {
+      const iframe = document.createElement('iframe');
+      iframe.className = 'spec-reference-frame';
+      iframe.src = challenge.referencePath;
+      iframe.title = `${challenge.title} reference design`;
+      iframe.setAttribute('loading', 'eager');
+      this.specImage.replaceWith(iframe);
+      this.specImage = null;
+      this.specImageWrapper.classList.add('has-reference-frame');
+
+      if (this.modalImage) {
+        const modalFrame = document.createElement('iframe');
+        modalFrame.className = 'modal-reference-frame';
+        modalFrame.src = challenge.referencePath;
+        modalFrame.title = `${challenge.title} enlarged reference design`;
+        this.modalImage.replaceWith(modalFrame);
+        this.modalImage = modalFrame;
       }
     }
   }

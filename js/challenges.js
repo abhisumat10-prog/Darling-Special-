@@ -376,3 +376,86 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.CHALLENGE_1_SPEC = CHALLENGE_1_SPEC;
 window.TUTORIAL_SPEC = TUTORIAL_SPEC;
+
+const CHALLENGE_MODE_TO_INDEX = {
+  challenge: 0,
+  challenge1: 0,
+  challenge2: 1,
+  challenge3: 2
+};
+
+function splitStarterDocument(source) {
+  const documentNode = new DOMParser().parseFromString(source, 'text/html');
+  const styles = Array.from(documentNode.querySelectorAll('style'))
+    .map(node => node.textContent.trim())
+    .filter(Boolean)
+    .join('\n\n');
+  const scripts = Array.from(documentNode.querySelectorAll('script'))
+    .filter(node => !node.src && !node.textContent.includes('/@react-refresh'))
+    .map(node => node.textContent.trim())
+    .filter(Boolean)
+    .join('\n\n');
+
+  documentNode.querySelectorAll('style, script').forEach(node => node.remove());
+
+  return {
+    html: documentNode.body.innerHTML.trim(),
+    css: styles,
+    js: scripts
+  };
+}
+
+function extractRequirements(markdown) {
+  const requirementsSection = markdown.split(/## (?:Acceptance Criteria|Accessibility Criteria[^\n]*)/i)[1] || markdown;
+  return requirementsSection
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => !/^-{3,}$/.test(line))
+    .filter(line => /^(?:\d+\.|-)/.test(line))
+    .map(line => line.replace(/^(?:\d+\.|-)\s*/, '').replace(/\*\*/g, ''))
+    .filter(line => line && !line.startsWith('---'));
+}
+
+async function loadPandaChallenge(mode) {
+  const response = await fetch('challenges/challenges.json');
+  if (!response.ok) throw new Error('Could not load Panda challenge registry.');
+
+  const challenges = await response.json();
+  const index = CHALLENGE_MODE_TO_INDEX[mode] ?? 0;
+  const metadata = challenges[index] || challenges[0];
+  const [specResponse, starterResponse] = await Promise.all([
+    fetch(metadata.specPath),
+    fetch(metadata.starterPath)
+  ]);
+
+  if (!specResponse.ok || !starterResponse.ok) {
+    throw new Error(`Could not load files for ${metadata.title}.`);
+  }
+
+  const [specMarkdown, starterDocument] = await Promise.all([
+    specResponse.text(),
+    starterResponse.text()
+  ]);
+
+  return {
+    ...metadata,
+    mode: 'challenge',
+    title: `${metadata.title}`,
+    description: metadata.description,
+    requirements: extractRequirements(specMarkdown),
+    specMarkdown,
+    referencePath: metadata.referencePath,
+    starterCode: splitStarterDocument(starterDocument)
+  };
+}
+
+window.loadSandboxSpec = async function loadSandboxSpec(mode) {
+  if (mode === 'tutorial') {
+    window.ACTIVE_SANDBOX_SPEC = window.TUTORIAL_SPEC;
+    return window.ACTIVE_SANDBOX_SPEC;
+  }
+
+  window.ACTIVE_SANDBOX_SPEC = await loadPandaChallenge(mode);
+  window.CHALLENGE_1_SPEC = window.ACTIVE_SANDBOX_SPEC;
+  return window.ACTIVE_SANDBOX_SPEC;
+};

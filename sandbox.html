@@ -40,6 +40,11 @@
     <!-- Question Area (Top Pane) -->
     <div id="question-pane" class="question-pane">
       <div class="question-content">
+        <nav id="challenge-switcher" class="challenge-switcher" aria-label="Choose a challenge">
+          <a href="/sandbox.html?mode=challenge1">Challenge 1</a>
+          <a href="/sandbox.html?mode=challenge2">Challenge 2</a>
+          <a href="/sandbox.html?mode=challenge3">Challenge 3</a>
+        </nav>
         <h2 id="question-title-body">Design Specification & Guidelines</h2>
         <p id="question-description" class="question-description">
           Loading challenge description...
@@ -145,17 +150,36 @@
   <script src="js/integration-hooks.js"></script>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       // Read sandbox mode from URL (?mode=tutorial or ?mode=challenge1)
       const urlParams = new URLSearchParams(window.location.search);
-      const mode = urlParams.get('mode') === 'tutorial' ? 'tutorial' : 'challenge';
+      const modeParam = urlParams.get('mode') || 'challenge1';
+      const mode = modeParam === 'tutorial' ? 'tutorial' : 'challenge';
+
+      const challengeSwitcher = document.getElementById('challenge-switcher');
+      if (mode === 'tutorial') {
+        challengeSwitcher.hidden = true;
+      } else {
+        const activeLink = challengeSwitcher.querySelector(`a[href$="mode=${modeParam}"]`);
+        if (activeLink) activeLink.classList.add('active');
+      }
+
+      let activeSpec;
+      try {
+        activeSpec = await window.loadSandboxSpec(modeParam);
+      } catch (error) {
+        document.getElementById('header-title').textContent = 'Challenge failed to load';
+        document.getElementById('question-description').textContent = error.message;
+        console.error(error);
+        return;
+      }
 
       // Initialize modules with mode
       const editorManager = new window.CodeEditorManager();
       window.editorManagerInstance = editorManager;
 
       const compilerEngine = new window.CodeCompilerEngine(editorManager);
-      const specViewer = new window.SpecViewerManager(mode);
+      const specViewer = new window.SpecViewerManager(mode, activeSpec);
 
       // Reset button handler
       const resetBtn = document.getElementById('btn-reset');
@@ -163,7 +187,7 @@
         resetBtn.addEventListener('click', () => {
           const msg = mode === 'tutorial'
             ? 'Reset tutorial playground code back to original Slider Pill UI template?'
-            : 'Reset Challenge #1 code back to original starter template and clear saved progress?';
+            : `Reset ${activeSpec.title} code back to its starter template and clear saved progress?`;
           if (confirm(msg)) {
             editorManager.resetCode();
             compilerEngine.compileAndSubmit(true);

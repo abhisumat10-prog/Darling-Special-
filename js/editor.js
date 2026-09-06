@@ -15,7 +15,10 @@ class CodeEditorManager {
     
     // Determine Sandbox Mode from URL query string (?mode=tutorial or ?mode=challenge1)
     const urlParams = new URLSearchParams(window.location.search);
-    this.mode = urlParams.get('mode') === 'tutorial' ? 'tutorial' : 'challenge';
+    this.modeParam = urlParams.get('mode') || 'challenge1';
+    this.mode = this.modeParam === 'tutorial' ? 'tutorial' : 'challenge';
+    this.challengeSpec = window.ACTIVE_SANDBOX_SPEC || window.CHALLENGE_1_SPEC;
+    this.storageKey = `${this.challengeSpec.id}_v2_saved_code`;
     this.hasUnsubmittedEdits = false;
 
     this.textarea = document.getElementById('code-textarea');
@@ -110,14 +113,14 @@ class CodeEditorManager {
       this.hasUnsubmittedEdits = false;
     } else {
       // Challenge 1 mode: restore saved code attempt if available
-      const savedCode = localStorage.getItem('challenge_1_saved_code');
+      const savedCode = localStorage.getItem(this.storageKey);
       if (savedCode) {
         try {
           const parsed = JSON.parse(savedCode);
-          this.codeBuffers.html = parsed.html || window.CHALLENGE_1_SPEC.starterCode.html;
-          this.codeBuffers.css = parsed.css || window.CHALLENGE_1_SPEC.starterCode.css;
-          this.codeBuffers.js = parsed.js || window.CHALLENGE_1_SPEC.starterCode.js;
-          console.log('[Editor] Restored saved code attempt for Challenge 1 from localStorage.');
+          this.codeBuffers.html = parsed.html || this.challengeSpec.starterCode.html;
+          this.codeBuffers.css = parsed.css || this.challengeSpec.starterCode.css;
+          this.codeBuffers.js = parsed.js || this.challengeSpec.starterCode.js;
+          console.log(`[Editor] Restored saved code attempt for ${this.challengeSpec.title}.`);
         } catch (e) {
           this.loadDefaultChallengeCode();
         }
@@ -129,7 +132,7 @@ class CodeEditorManager {
   }
 
   loadDefaultChallengeCode() {
-    const spec = window.CHALLENGE_1_SPEC;
+    const spec = this.challengeSpec;
     this.codeBuffers.html = spec.starterCode.html;
     this.codeBuffers.css = spec.starterCode.css;
     this.codeBuffers.js = spec.starterCode.js;
@@ -138,7 +141,7 @@ class CodeEditorManager {
   saveSubmittedCode() {
     if (this.mode === 'challenge') {
       this.codeBuffers[this.activeTab] = this.textarea.value;
-      localStorage.setItem('challenge_1_saved_code', JSON.stringify(this.codeBuffers));
+      localStorage.setItem(this.storageKey, JSON.stringify(this.codeBuffers));
       this.hasUnsubmittedEdits = false;
       console.log('[Editor] Code attempt saved to localStorage for Challenge 1.');
     }
@@ -236,7 +239,7 @@ class CodeEditorManager {
       this.codeBuffers.css = spec.starterCode.css;
       this.codeBuffers.js = spec.starterCode.js;
     } else {
-      localStorage.removeItem('challenge_1_saved_code');
+      localStorage.removeItem(this.storageKey);
       this.loadDefaultChallengeCode();
     }
     this.textarea.value = this.codeBuffers[this.activeTab];
