@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frontend Sandbox - Challenge #1</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Sandbox Navigation Header -->
+  <header class="sandbox-header">
+    <a href="index.html" class="btn-back">
+      &larr; Back to Landing Page
+    </a>
+
+    <div class="challenge-title-header">
+      <span id="question-title">Challenge 1: Interactive Pricing Card Component</span>
+      <span class="difficulty-tag">Easy</span>
+    </div>
+
+    <div class="header-actions">
+      <div id="compiler-status" class="status-badge ready">
+        <span class="dot-indicator"></span> Ready
+      </div>
+      <button id="btn-reset" class="btn-secondary">Reset Code</button>
+      <button id="btn-run" class="btn-secondary">Run / Preview</button>
+      <button id="btn-submit" class="btn-submit">
+        <span>Submit Code</span> &rarr;
+      </button>
+    </div>
+  </header>
+
+  <!-- Sandbox Body Layout -->
+  <div class="sandbox-layout">
+
+    <!-- Question Area (Top Pane) -->
+    <div id="question-pane" class="question-pane">
+      <div class="question-content">
+        <h2 id="question-title-body">Design Specification & Guidelines</h2>
+        <p id="question-description" class="question-description">
+          Loading challenge description...
+        </p>
+        <div id="requirements-list" class="requirements-list">
+          <!-- Requirements items dynamically injected -->
+        </div>
+      </div>
+
+      <!-- Question Visual Spec Container with Figma Inspector Tabs -->
+      <div class="question-spec-container">
+        <div class="spec-header">
+          <div class="spec-view-tabs">
+            <button id="tab-spec-visual" class="spec-tab-btn active" title="Rendered Visual Spec">🎨 Visual Spec</button>
+            <button id="tab-spec-figma" class="spec-tab-btn" title="Live Figma Embed">❖ Figma Embed</button>
+            <button id="tab-spec-tokens" class="spec-tab-btn" title="Figma Dev Mode / Design Tokens">⚡ Dev Mode</button>
+          </div>
+          <div class="resize-controls">
+            <span>Height:</span>
+            <input type="range" id="resize-slider" class="resize-slider" min="180" max="450" value="280">
+          </div>
+        </div>
+        
+        <!-- Tab 1: Rendered Visual Spec Image -->
+        <div id="spec-image-wrapper" class="spec-image-wrapper" title="Click to enlarge target design spec">
+          <img id="spec-image" class="spec-image" alt="Target Design Spec">
+          <div class="spec-zoom-badge">
+            🔍 Click to Enlarge
+          </div>
+        </div>
+
+        <!-- Tab 2: Live Figma Interactive Embed Container -->
+        <div id="spec-figma-wrapper" class="spec-figma-wrapper" style="display: none;">
+          <iframe id="figma-embed-iframe" class="figma-embed-iframe" title="Figma Live Spec Embed" allowfullscreen></iframe>
+        </div>
+
+        <!-- Tab 3: Figma Dev Mode & Design Tokens View -->
+        <div id="spec-tokens-wrapper" class="spec-tokens-wrapper" style="display: none;">
+          <div class="tokens-section-title">🎨 Figma Design Tokens</div>
+          <div id="figma-tokens-container" class="figma-tokens-container">
+            <!-- Populated dynamically by SpecViewerManager -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workspace Split Pane (Left Editor + Right Output Preview) -->
+    <div class="workspace-split">
+
+      <!-- Left Box: Code Editor -->
+      <div class="editor-box">
+        <div class="box-header">
+          <div class="editor-tabs">
+            <button class="tab-btn active" data-lang="html">
+              <span class="tab-icon">&lt;/&gt;</span> HTML
+            </button>
+            <button class="tab-btn" data-lang="css">
+              <span class="tab-icon">#</span> CSS
+            </button>
+            <button class="tab-btn" data-lang="js">
+              <span class="tab-icon">js</span> JavaScript
+            </button>
+          </div>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">Tab Size: 2 spaces</span>
+        </div>
+
+        <div class="editor-container">
+          <div class="code-textarea-wrapper">
+            <div id="line-numbers" class="line-numbers">
+              <!-- Line numbers dynamically populated -->
+            </div>
+            <textarea id="code-textarea" class="code-textarea" spellcheck="false" autocomplete="off"></textarea>
+          </div>
+        </div>
+
+        <!-- Compiler Line Error Banner (Displays syntax/compiler errors upon submit) -->
+        <div id="error-banner" class="error-banner"></div>
+      </div>
+
+      <!-- Right Box: Live Output Preview & Figma Canvas Resizer -->
+      <div class="output-box">
+        <div class="box-header">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span style="font-size: 0.85rem; font-weight: 600; color: #fff;">
+              Live Preview Output
+            </span>
+            <!-- Figma Overlay Match Toggle Button -->
+            <button id="btn-toggle-overlay" class="overlay-toggle-btn" title="Toggle Figma Target Spec Overlay on preview">
+              ❖ Overlay Spec
+            </button>
+          </div>
+
+          <div class="output-viewport-bar">
+            <!-- Viewport Preset Buttons -->
+            <button id="view-desktop" class="viewport-btn active">Desktop</button>
+            <button id="view-tablet" class="viewport-btn">Tablet (768px)</button>
+            <button id="view-mobile" class="viewport-btn">Mobile (375px)</button>
+            
+            <!-- Dynamic Width & Height Sliders (Inspired by Figma Inspector Controls) -->
+            <div class="canvas-slider-group" title="Adjust canvas viewport dimensions">
+              <div class="slider-item">
+                <span class="slider-label">W:</span>
+                <input type="range" id="width-slider" class="figma-dim-slider" min="320" max="1100" value="100">
+                <span id="width-val" class="dim-val">Auto</span>
+              </div>
+              <div class="slider-item">
+                <span class="slider-label">H:</span>
+                <input type="range" id="height-slider" class="figma-dim-slider" min="250" max="800" value="100">
+                <span id="height-val" class="dim-val">Auto</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-container" id="preview-container">
+          <!-- Figma Spec Overlay Layer (hidden by default) -->
+          <div id="figma-overlay-layer" class="figma-overlay-layer" style="display: none;">
+            <img id="overlay-spec-image" class="overlay-spec-image" alt="Figma Overlay Spec">
+            <div class="overlay-opacity-bar">
+              <span>Opacity:</span>
+              <input type="range" id="overlay-opacity-slider" min="0" max="100" value="50">
+              <span id="opacity-val">50%</span>
+            </div>
+          </div>
+
+          <iframe id="preview-iframe" class="preview-iframe" title="Component Live Preview" sandbox="allow-scripts allow-modals"></iframe>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Enlargeable Image Lightbox Zoom Modal -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal-content">
+      <button id="modal-close" class="modal-close-btn" title="Close Lightbox">&times;</button>
+      <img id="modal-image" class="modal-image" alt="Target Design Spec Lightbox">
+      
+      <div class="modal-controls">
+        <button id="zoom-in" class="modal-btn">➕ Zoom In</button>
+        <button id="zoom-out" class="modal-btn">➖ Zoom Out</button>
+        <button id="zoom-reset" class="modal-btn">🔄 Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script Modules -->
+  <script src="js/challenges.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/compiler.js"></script>
+  <script src="js/spec-viewer.js"></script>
+  <script src="js/integration-hooks.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize modules
+      const editorManager = new window.CodeEditorManager();
+      window.editorManagerInstance = editorManager;
+
+      const compilerEngine = new window.CodeCompilerEngine(editorManager);
+      const specViewer = new window.SpecViewerManager();
+
+      // Reset button handler
+      const resetBtn = document.getElementById('btn-reset');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          if (confirm('Reset code back to original starter template?')) {
+            editorManager.resetCode();
+            compilerEngine.compileAndSubmit(true);
+          }
+        });
+      }
+
+      // Viewport Switcher Handlers
+      const iframe = document.getElementById('preview-iframe');
+      const viewDesktop = document.getElementById('view-desktop');
+      const viewTablet = document.getElementById('view-tablet');
+      const viewMobile = document.getElementById('view-mobile');
+
+      const setViewport = (mode) => {
+        iframe.className = 'preview-iframe ' + (mode === 'desktop' ? '' : mode);
+        [viewDesktop, viewTablet, viewMobile].forEach(btn => btn.classList.remove('active'));
+        if (mode === 'desktop') viewDesktop.classList.add('active');
+        if (mode === 'tablet') viewTablet.classList.add('active');
+        if (mode === 'mobile') viewMobile.classList.add('active');
+      };
+
+      viewDesktop.addEventListener('click', () => setViewport('desktop'));
+      viewTablet.addEventListener('click', () => setViewport('tablet'));
+      viewMobile.addEventListener('click', () => setViewport('mobile'));
+    });
+  </script>
+
+</body>
+</html>
