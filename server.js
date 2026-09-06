@@ -1,10 +1,12 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
 
 const app = express();
+app.use(cors());
 app.use(express.json({ limit: "5mb" }));
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -17,7 +19,7 @@ async function generateWithRetry(prompt, maxRetries = 3) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash-lite",
+        model: "gemini-3.6-flash",
         contents: prompt,
       });
       return response;
@@ -70,7 +72,18 @@ Respond with ONLY valid JSON, no markdown, no preamble, in this exact shape:
     const response = await generateWithRetry(prompt);
     const responseText = response.text;
     const cleaned = responseText.replace(/```json|```/g, "").trim();
-    const parsed = JSON.parse(cleaned);
+
+    let parsed;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch (parseErr) {
+      console.error("JSON parse failed. Raw model response was:");
+      console.error(responseText);
+      return res.status(502).json({
+        error: "Model returned malformed JSON",
+        rawResponse: responseText,
+      });
+    }
 
     res.json(parsed);
   } catch (err) {
