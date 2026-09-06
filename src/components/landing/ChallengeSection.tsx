@@ -1,0 +1,89 @@
+import { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'motion/react';
+
+export default function ChallengeSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"]
+  });
+
+  // Different speeds for parallax effect
+  const y1 = useTransform(scrollYProgress, [0, 1], ["20%", "-20%"]);
+  const y2 = useTransform(scrollYProgress, [0, 1], ["40%", "-40%"]);
+  const y3 = useTransform(scrollYProgress, [0, 1], ["10%", "-10%"]);
+  const y4 = useTransform(scrollYProgress, [0, 1], ["60%", "-60%"]);
+
+  return (
+    <section ref={containerRef} className="relative min-h-[150vh] bg-[#050606] border-t border-neutral-900 py-32 overflow-hidden">
+      <div className="container mx-auto px-6 md:px-12 relative z-10">
+        
+        <div className="max-w-2xl">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="font-mono text-xs tracking-[0.2em] uppercase text-[#ccff00]">01 // The Challenges</span>
+          </div>
+          
+          <h2 className="font-display text-6xl md:text-8xl leading-none uppercase tracking-tight text-white mb-6">
+            Real Designs.<br />
+            <span className="text-neutral-600">Real Challenges.</span>
+          </h2>
+          
+          <p className="text-xl text-neutral-400 font-body border-l border-neutral-800 pl-6">
+            Recreate modern interfaces from real-world design specifications. Build pixel-perfect SaaS dashboards, immersive e-commerce pages, and complex interactive components.
+          </p>
+        </div>
+
+      </div>
+
+      {/* Floating UI Cards */}
+      <div className="absolute inset-0 top-[40vh] pointer-events-none">
+        {/* Main Challenge Card */}
+        <motion.div style={{ y: y1 }} className="absolute right-[10%] top-[10%] w-[500px] h-[350px] bg-[#080909] border border-neutral-800 shadow-2xl p-6 flex flex-col gap-4">
+          <div className="flex justify-between items-center border-b border-neutral-800 pb-4">
+            <div className="font-mono text-xs uppercase tracking-widest text-white">SaaS Dashboard</div>
+            <div className="font-mono text-xs text-[#ccff00]">Hard</div>
+          </div>
+          <div className="flex-1 flex gap-4">
+            <div className="w-1/4 bg-neutral-900"></div>
+            <div className="flex-1 flex flex-col gap-4">
+              <div className="h-20 bg-neutral-900 w-full"></div>
+              <div className="flex gap-4 flex-1">
+                <div className="flex-1 bg-neutral-900"></div>
+                <div className="flex-1 bg-neutral-900"></div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Secondary Card 1 */}
+        <motion.div style={{ y: y2 }} className="absolute right-[40%] top-[40%] w-[300px] h-[400px] bg-[#080909] border border-neutral-800 shadow-2xl p-6 flex flex-col gap-4 opacity-60">
+          <div className="flex justify-between items-center border-b border-neutral-800 pb-4">
+            <div className="font-mono text-xs uppercase tracking-widest text-white">E-Commerce</div>
+            <div className="font-mono text-xs text-neutral-500">Medium</div>
+          </div>
+          <div className="h-40 bg-neutral-900 w-full"></div>
+          <div className="h-6 bg-neutral-900 w-3/4"></div>
+          <div className="h-4 bg-[#ccff00] w-1/4 opacity-50"></div>
+        </motion.div>
+
+        {/* Secondary Card 2 */}
+        <motion.div style={{ y: y3 }} className="absolute right-[5%] top-[60%] w-[350px] h-[250px] bg-[#080909] border border-neutral-800 shadow-2xl p-4 flex flex-col opacity-80 z-20">
+          <div className="flex justify-between items-center border-b border-neutral-800 pb-2 mb-4">
+            <div className="font-mono text-xs uppercase tracking-widest text-white">Analytics</div>
+            <div className="font-mono text-xs text-neutral-500">Expert</div>
+          </div>
+          <div className="flex-1 border border-neutral-800 flex items-end px-4 gap-2">
+            <div className="w-full h-[40%] bg-neutral-800"></div>
+            <div className="w-full h-[70%] bg-neutral-800"></div>
+            <div className="w-full h-[50%] bg-[#ccff00] opacity-30"></div>
+            <div className="w-full h-[90%] bg-neutral-800"></div>
+          </div>
+        </motion.div>
+        
+        {/* Abstract shape */}
+        <motion.div style={{ y: y4 }} className="absolute left-[10%] top-[70%] w-[200px] h-[200px] border border-neutral-800 rounded-full opacity-20"></motion.div>
+      </div>
+    </section>
+  );
+}
