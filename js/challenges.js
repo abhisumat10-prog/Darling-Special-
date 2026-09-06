@@ -377,13 +377,6 @@ document.addEventListener('DOMContentLoaded', () => {
 window.CHALLENGE_1_SPEC = CHALLENGE_1_SPEC;
 window.TUTORIAL_SPEC = TUTORIAL_SPEC;
 
-const CHALLENGE_MODE_TO_INDEX = {
-  challenge: 0,
-  challenge1: 0,
-  challenge2: 1,
-  challenge3: 2
-};
-
 function splitStarterDocument(source) {
   const documentNode = new DOMParser().parseFromString(source, 'text/html');
   const styles = Array.from(documentNode.querySelectorAll('style'))
@@ -421,8 +414,8 @@ async function loadPandaChallenge(mode) {
   if (!response.ok) throw new Error('Could not load Panda challenge registry.');
 
   const challenges = await response.json();
-  const index = CHALLENGE_MODE_TO_INDEX[mode] ?? 0;
-  const metadata = challenges[index] || challenges[0];
+  const challengeNumber = mode.match(/\d+/)?.[0] || '1';
+  const metadata = challenges.find(challenge => challenge.id.startsWith(`challenge-${challengeNumber}-`)) || challenges[0];
   const [specResponse, starterResponse] = await Promise.all([
     fetch(metadata.specPath),
     fetch(metadata.starterPath)
@@ -443,6 +436,7 @@ async function loadPandaChallenge(mode) {
     title: `${metadata.title}`,
     description: metadata.description,
     requirements: extractRequirements(specMarkdown),
+    allChallenges: challenges,
     specMarkdown,
     referencePath: metadata.referencePath,
     starterCode: splitStarterDocument(starterDocument)

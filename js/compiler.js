@@ -200,7 +200,11 @@ class CodeCompilerEngine {
     }
 
     // Detect unclosed HTML tags line numbers
-    const lines = htmlCode.split('\n');
+    // Ignore example tags inside HTML comments while preserving line numbers.
+    const htmlWithoutComments = htmlCode.replace(/<!--[\s\S]*?-->/g, comment =>
+      comment.replace(/[^\n]/g, ' ')
+    );
+    const lines = htmlWithoutComments.split('\n');
     const tagStack = [];
 
     for (let i = 0; i < lines.length; i++) {

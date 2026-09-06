@@ -394,6 +394,13 @@ body {
   margin-bottom: 0.6rem;
 }
 
+.challenge-meta {
+  margin-bottom: 0.65rem;
+  color: var(--accent-yellow);
+  font: 600 0.7rem/1.4 var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
 .requirements-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -872,6 +879,8 @@ body {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 0.85rem;
+  overflow-x: auto;
+  padding-bottom: 0.2rem;
 }
 
 .challenge-switcher a {

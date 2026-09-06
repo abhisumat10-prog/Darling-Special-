@@ -41,11 +41,10 @@
     <div id="question-pane" class="question-pane">
       <div class="question-content">
         <nav id="challenge-switcher" class="challenge-switcher" aria-label="Choose a challenge">
-          <a href="/sandbox.html?mode=challenge1">Challenge 1</a>
-          <a href="/sandbox.html?mode=challenge2">Challenge 2</a>
-          <a href="/sandbox.html?mode=challenge3">Challenge 3</a>
+          <!-- Populated from Panda's challenge registry -->
         </nav>
         <h2 id="question-title-body">Design Specification & Guidelines</h2>
+        <p id="challenge-meta" class="challenge-meta"></p>
         <p id="question-description" class="question-description">
           Loading challenge description...
         </p>
@@ -171,12 +170,7 @@
       const mode = modeParam === 'tutorial' ? 'tutorial' : 'challenge';
 
       const challengeSwitcher = document.getElementById('challenge-switcher');
-      if (mode === 'tutorial') {
-        challengeSwitcher.hidden = true;
-      } else {
-        const activeLink = challengeSwitcher.querySelector(`a[href$="mode=${modeParam}"]`);
-        if (activeLink) activeLink.classList.add('active');
-      }
+      if (mode === 'tutorial') challengeSwitcher.hidden = true;
 
       let activeSpec;
       try {
@@ -186,6 +180,21 @@
         document.getElementById('question-description').textContent = error.message;
         console.error(error);
         return;
+      }
+
+      if (mode === 'challenge') {
+        activeSpec.allChallenges.forEach(challenge => {
+          const challengeNumber = challenge.id.match(/^challenge-(\d+)-/)?.[1];
+          if (!challengeNumber) return;
+          const link = document.createElement('a');
+          link.href = `/sandbox.html?mode=challenge${challengeNumber}`;
+          link.textContent = `Challenge ${challengeNumber}`;
+          if (`challenge${challengeNumber}` === modeParam || (modeParam === 'challenge' && challengeNumber === '1')) {
+            link.classList.add('active');
+            link.setAttribute('aria-current', 'page');
+          }
+          challengeSwitcher.appendChild(link);
+        });
       }
 
       // Initialize modules with mode

@@ -92,10 +92,16 @@ class SpecViewerManager {
     const descEl = document.getElementById('question-description');
     const reqListEl = document.getElementById('requirements-list');
     const modeTagEl = document.getElementById('mode-tag');
+    const metaEl = document.getElementById('challenge-meta');
 
     if (headerTitleEl) headerTitleEl.textContent = challenge.title;
     if (titleEl) titleEl.textContent = challenge.title;
     if (descEl) descEl.textContent = challenge.description;
+    if (metaEl) {
+      metaEl.textContent = challenge.estimatedMinutes
+        ? `${challenge.category} · About ${challenge.estimatedMinutes} minutes`
+        : challenge.category || '';
+    }
 
     if (modeTagEl) {
       modeTagEl.textContent = challenge.difficulty;
