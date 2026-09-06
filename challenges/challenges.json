@@ -4,32 +4,77 @@
     "title": "Responsive SaaS Pricing Card",
     "difficulty": "Easy",
     "category": "Visual & Responsive",
+    "estimatedMinutes": 15,
     "description": "Implement a responsive pricing tier card with hover micro-interactions, badge styling, and clean typography.",
     "specPath": "challenges/challenge-1-pricing-card/spec.md",
     "starterPath": "challenges/challenge-1-pricing-card/starter.html",
     "referencePath": "challenges/challenge-1-pricing-card/reference.html",
-    "recommendedBreakpoints": [375, 640, 1200]
+    "recommendedBreakpoints": [375, 640, 1200],
+    "tags": ["Flexbox", "CSS Grid", "Responsive", "Tokens"]
   },
   {
     "id": "challenge-2-navbar-dropdown",
-    "title": "Responsive Navbar with Mobile Drawer",
+    "title": "Responsive Navbar with Drawer",
     "difficulty": "Medium",
     "category": "Layout & Interactions",
-    "description": "Build a responsive navigation bar that adapts from horizontal desktop links to a mobile hamburger toggle drawer.",
+    "estimatedMinutes": 25,
+    "description": "Build a responsive navigation bar that adapts from horizontal desktop links to a mobile hamburger toggle drawer with Escape dismissal.",
     "specPath": "challenges/challenge-2-navbar-dropdown/spec.md",
     "starterPath": "challenges/challenge-2-navbar-dropdown/starter.html",
     "referencePath": "challenges/challenge-2-navbar-dropdown/reference.html",
-    "recommendedBreakpoints": [375, 768, 1200]
+    "recommendedBreakpoints": [375, 768, 1200],
+    "tags": ["Navigation", "Transitions", "DOM Events", "Breakpoints"]
+  },
+  {
+    "id": "challenge-4-autocomplete",
+    "title": "Search Autocomplete Combobox",
+    "difficulty": "Medium",
+    "category": "Async & Keyboard Navigation",
+    "estimatedMinutes": 30,
+    "description": "Construct an accessible autocomplete input with instant query highlighting, arrow key traversal, and WAI-ARIA Combobox attributes.",
+    "specPath": "challenges/challenge-4-autocomplete/spec.md",
+    "starterPath": "challenges/challenge-4-autocomplete/starter.html",
+    "referencePath": "challenges/challenge-4-autocomplete/reference.html",
+    "recommendedBreakpoints": [375, 768, 1200],
+    "tags": ["Combobox", "Keyboard A11y", "Search", "ARIA"]
   },
   {
     "id": "challenge-3-accessible-modal",
     "title": "Accessible Confirmation Modal",
     "difficulty": "Hard",
     "category": "Accessibility & WCAG",
-    "description": "Construct an accessible confirmation dialog with backdrop blur, keyboard Escape dismissal, and WCAG AA compliance.",
+    "estimatedMinutes": 35,
+    "description": "Construct an accessible confirmation dialog with backdrop blur, keyboard Escape dismissal, focus management, and WCAG AA compliance.",
     "specPath": "challenges/challenge-3-accessible-modal/spec.md",
     "starterPath": "challenges/challenge-3-accessible-modal/starter.html",
     "referencePath": "challenges/challenge-3-accessible-modal/reference.html",
-    "recommendedBreakpoints": [375, 768, 1200]
+    "recommendedBreakpoints": [375, 768, 1200],
+    "tags": ["Modal", "axe-core", "Dialog Role", "Focus Trap"]
+  },
+  {
+    "id": "challenge-5-multi-step-form",
+    "title": "Multi-Step Form Wizard",
+    "difficulty": "Hard",
+    "category": "State Management & Forms",
+    "estimatedMinutes": 40,
+    "description": "Build a 3-step registration wizard with state persistence, inline field validation, progress stepper, and accessible error alerts.",
+    "specPath": "challenges/challenge-5-multi-step-form/spec.md",
+    "starterPath": "challenges/challenge-5-multi-step-form/starter.html",
+    "referencePath": "challenges/challenge-5-multi-step-form/reference.html",
+    "recommendedBreakpoints": [375, 640, 1200],
+    "tags": ["Forms", "Validation", "aria-invalid", "Stepper"]
+  },
+  {
+    "id": "challenge-6-data-table",
+    "title": "Sortable Data Table with Pagination",
+    "difficulty": "Hard",
+    "category": "Data Display & Table Semantics",
+    "estimatedMinutes": 45,
+    "description": "Develop a responsive, accessible data table with column sorting, keyword search filtering, pagination controls, and status pills.",
+    "specPath": "challenges/challenge-6-data-table/spec.md",
+    "starterPath": "challenges/challenge-6-data-table/starter.html",
+    "referencePath": "challenges/challenge-6-data-table/reference.html",
+    "recommendedBreakpoints": [375, 768, 1200],
+    "tags": ["Tables", "Sorting", "aria-sort", "Pagination"]
   }
 ]

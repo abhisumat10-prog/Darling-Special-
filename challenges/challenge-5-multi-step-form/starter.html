@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Step Form Wizard Challenge</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f8fafc;
+      padding: 40px 16px;
+    }
+
+    .wizard-card {
+      max-width: 560px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 12px;
+    }
+
+    /* 
+      TODO: Style the multi-step stepper, input fields, error highlights, and buttons
+      - Connective line between step numbers
+      - Clear active step highlight
+      - Red border and readable error messages on validation failure
+    */
+  </style>
+</head>
+<body>
+  <!-- 
+    TODO: Build an accessible 3-step form wizard:
+    - Step 1: Account (Full Name, Email)
+    - Step 2: Company (Company Name, Size dropdown, Terms checkbox)
+    - Step 3: Review summary card
+    - Connect aria-invalid and aria-describedby for errors
+  -->
+  <main class="wizard-card">
+    <h2>Registration Wizard</h2>
+    <form id="wizardForm">
+      <div>
+        <label for="name">Full Name</label>
+        <input type="text" id="name" />
+      </div>
+      <div>
+        <label for="email">Email</label>
+        <input type="email" id="email" />
+      </div>
+      <button type="button" id="nextBtn">Next</button>
+    </form>
+  </main>
+
+  <script>
+    // TODO: Implement state management, step validation, and review panel
+  </script>
+</body>
+</html>
