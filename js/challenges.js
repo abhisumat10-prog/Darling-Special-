@@ -436,7 +436,10 @@ async function loadPandaChallenge(mode) {
     title: `${metadata.title}`,
     description: metadata.description,
     requirements: extractRequirements(specMarkdown),
-    allChallenges: challenges,
+    allChallenges: [...challenges].sort((a, b) => {
+      const numberFor = challenge => Number(challenge.id.match(/^challenge-(\d+)-/)?.[1] || Infinity);
+      return numberFor(a) - numberFor(b);
+    }),
     specMarkdown,
     referencePath: metadata.referencePath,
     starterCode: splitStarterDocument(starterDocument)
