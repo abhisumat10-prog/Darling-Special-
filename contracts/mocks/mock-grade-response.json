@@ -1,0 +1,46 @@
+{
+  "overallScore": 78,
+  "letterGrade": "C",
+  "summary": "Great visual layout and typography hierarchy, but serious accessibility and contrast issues prevent this from being production-ready.",
+  "categoryScores": {
+    "visualAccuracy": {
+      "score": 88,
+      "feedback": "Card dimensions, padding, and font sizes closely match the reference spec with only minor 12% pixel drift on border-radius and button height."
+    },
+    "accessibility": {
+      "score": 55,
+      "feedback": "Failed WCAG AA contrast on the primary CTA. White text (#FFFFFF) on light blue (#93C5FD) gives only 2.1:1 contrast ratio, failing the minimum 4.5:1 requirement.",
+      "violationsSummary": [
+        "Elements must have sufficient color contrast: CTA button text fails WCAG AA (ratio 2.1:1)"
+      ]
+    },
+    "responsiveDesign": {
+      "score": 85,
+      "feedback": "Card centers cleanly on both mobile and desktop viewports, though it lacks an explicit max-width clamp for smaller screens."
+    },
+    "codeQuality": {
+      "score": 82,
+      "feedback": "Clean CSS structure with sensible class names. Recommend switching from arbitrary pixel widths to relative units (rem/ch) and semantic `<article>` tags."
+    }
+  },
+  "actionableFeedback": [
+    {
+      "type": "a11y",
+      "title": "Fix Call-to-Action Color Contrast",
+      "detail": "WCAG AA requires a 4.5:1 contrast ratio for normal text. Darken the button background to #2563EB or use darker text to ensure readability for visually impaired users.",
+      "suggestedCodeSnippet": "/* Update in your CSS */\n.btn {\n  background: #2563eb; /* 4.6:1 contrast ratio against white */\n  color: #ffffff;\n}"
+    },
+    {
+      "type": "layout",
+      "title": "Use Responsive Max-Width",
+      "detail": "Hardcoding `width: 320px` can cause horizontal overflow on viewports below 320px. Use `width: 100%` paired with `max-width: 360px`.",
+      "suggestedCodeSnippet": ".card {\n  width: 100%;\n  max-width: 360px;\n  margin: 0 auto;\n}"
+    },
+    {
+      "type": "code-craft",
+      "title": "Use Semantic HTML Tags",
+      "detail": "Wrap the component in an `<article>` with an appropriate heading structure (`<h3>`) rather than a generic `<div>` to improve screen-reader document landmark navigation.",
+      "suggestedCodeSnippet": "<article class=\"card\" aria-label=\"Pro plan pricing\">\n  <header><h3>Pro Plan</h3></header>\n  ...\n</article>"
+    }
+  ]
+}

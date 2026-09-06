@@ -1,0 +1,35 @@
+[
+  {
+    "id": "challenge-1-pricing-card",
+    "title": "Responsive SaaS Pricing Card",
+    "difficulty": "Easy",
+    "category": "Visual & Responsive",
+    "description": "Implement a responsive pricing tier card with hover micro-interactions, badge styling, and clean typography.",
+    "specPath": "challenges/challenge-1-pricing-card/spec.md",
+    "starterPath": "challenges/challenge-1-pricing-card/starter.html",
+    "referencePath": "challenges/challenge-1-pricing-card/reference.html",
+    "recommendedBreakpoints": [375, 640, 1200]
+  },
+  {
+    "id": "challenge-2-navbar-dropdown",
+    "title": "Responsive Navbar with Mobile Drawer",
+    "difficulty": "Medium",
+    "category": "Layout & Interactions",
+    "description": "Build a responsive navigation bar that adapts from horizontal desktop links to a mobile hamburger toggle drawer.",
+    "specPath": "challenges/challenge-2-navbar-dropdown/spec.md",
+    "starterPath": "challenges/challenge-2-navbar-dropdown/starter.html",
+    "referencePath": "challenges/challenge-2-navbar-dropdown/reference.html",
+    "recommendedBreakpoints": [375, 768, 1200]
+  },
+  {
+    "id": "challenge-3-accessible-modal",
+    "title": "Accessible Confirmation Modal",
+    "difficulty": "Hard",
+    "category": "Accessibility & WCAG",
+    "description": "Construct an accessible confirmation dialog with backdrop blur, keyboard Escape dismissal, and WCAG AA compliance.",
+    "specPath": "challenges/challenge-3-accessible-modal/spec.md",
+    "starterPath": "challenges/challenge-3-accessible-modal/starter.html",
+    "referencePath": "challenges/challenge-3-accessible-modal/reference.html",
+    "recommendedBreakpoints": [375, 768, 1200]
+  }
+]

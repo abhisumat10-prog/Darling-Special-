@@ -1,0 +1,28 @@
+{
+  "challengeId": "challenge-1-pricing-card",
+  "submittedCode": {
+    "html": "<div class=\"card\">\n  <h2>Pro Plan</h2>\n  <p class=\"price\">$29/mo</p>\n  <button class=\"btn\">Get Started</button>\n</div>",
+    "css": ".card { padding: 24px; border: 1px solid #ccc; border-radius: 8px; width: 320px; font-family: sans-serif; }\n.price { font-size: 32px; font-weight: bold; color: #10b981; }\n.btn { background: #93c5fd; color: #ffffff; border: none; padding: 12px 20px; border-radius: 6px; width: 100%; cursor: pointer; }"
+  },
+  "visualDiff": {
+    "diffPercentage": 12.4,
+    "pixelMismatchCount": 1840,
+    "viewport": {
+      "width": 1200,
+      "height": 800
+    }
+  },
+  "axeReport": {
+    "violationsCount": 1,
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must have sufficient color contrast (button has white text on light blue #93c5fd, ratio 2.1:1, required 4.5:1)",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/color-contrast",
+        "nodesCount": 1,
+        "summary": "Fix button text color contrast"
+      }
+    ]
+  }
+}

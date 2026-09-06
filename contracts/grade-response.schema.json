@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GradeResponse",
+  "description": "Payload returned by /grade endpoint and rendered by Person 4's feedback UI",
+  "type": "object",
+  "required": [
+    "overallScore",
+    "letterGrade",
+    "summary",
+    "categoryScores",
+    "actionableFeedback"
+  ],
+  "properties": {
+    "overallScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Weighted composite score out of 100"
+    },
+    "letterGrade": {
+      "type": "string",
+      "enum": ["S", "A", "B", "C", "D", "F"],
+      "description": "Quick visual indicator of mastery"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Short, punchy 1-2 sentence evaluation from the AI evaluator"
+    },
+    "categoryScores": {
+      "type": "object",
+      "required": ["visualAccuracy", "accessibility", "responsiveDesign", "codeQuality"],
+      "properties": {
+        "visualAccuracy": {
+          "type": "object",
+          "required": ["score", "feedback"],
+          "properties": {
+            "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "feedback": { "type": "string" }
+          }
+        },
+        "accessibility": {
+          "type": "object",
+          "required": ["score", "feedback", "violationsSummary"],
+          "properties": {
+            "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "feedback": { "type": "string" },
+            "violationsSummary": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "responsiveDesign": {
+          "type": "object",
+          "required": ["score", "feedback"],
+          "properties": {
+            "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "feedback": { "type": "string" }
+          }
+        },
+        "codeQuality": {
+          "type": "object",
+          "required": ["score", "feedback"],
+          "properties": {
+            "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "feedback": { "type": "string" }
+          }
+        }
+      }
+    },
+    "actionableFeedback": {
+      "type": "array",
+      "description": "Prioritized list of specific fixes ordered by impact",
+      "items": {
+        "type": "object",
+        "required": ["type", "title", "detail", "suggestedCodeSnippet"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["a11y", "layout", "responsiveness", "code-craft"]
+          },
+          "title": { "type": "string" },
+          "detail": { "type": "string" },
+          "suggestedCodeSnippet": { "type": "string" }
+        }
+      }
+    }
+  }
+}
