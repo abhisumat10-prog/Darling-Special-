@@ -23,6 +23,10 @@
     "@google/genai": "^2.21.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "axe-core": "^4.13.0",
+    "html2canvas": "^1.4.1",
+    "pixelmatch": "^7.2.0",
+    "pngjs": "^7.0.0"
   }
 }
