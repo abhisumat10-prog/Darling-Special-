@@ -40,14 +40,14 @@ export default function HeroSection() {
               Turn real designs into code. Get an AI-powered evaluation. Improve your frontend skills.
             </p>
             <div className="flex flex-wrap items-center gap-6">
-              <button className="group flex items-center gap-3 bg-[#ccff00] text-black px-8 py-4 font-mono text-sm tracking-widest font-bold uppercase transition-all hover:bg-white">
-                Start a Challenge
+              <a href="/sandbox.html?mode=challenge1" className="group flex items-center gap-3 bg-[#ccff00] text-black px-8 py-4 font-mono text-sm tracking-widest font-bold uppercase transition-all hover:bg-white">
+                Start Challenge #1
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </button>
-              <button className="group flex items-center gap-3 text-white px-8 py-4 font-mono text-sm tracking-widest uppercase border border-neutral-800 transition-all hover:border-[#ccff00]">
+              </a>
+              <a href="/sandbox.html?mode=tutorial" className="group flex items-center gap-3 text-white px-8 py-4 font-mono text-sm tracking-widest uppercase border border-neutral-800 transition-all hover:border-[#ccff00]">
                 <Play className="w-4 h-4 text-[#ccff00]" />
-                Watch How It Works
-              </button>
+                Tutorial Sandbox
+              </a>
             </div>
           </div>
         </motion.div>

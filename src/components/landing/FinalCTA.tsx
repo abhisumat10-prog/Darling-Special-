@@ -1,6 +1,5 @@
 import { ArrowRight } from 'lucide-react';
 
-
 export default function FinalCTA() {
   return (
     <section className="relative bg-dark py-32 border-t border-neutral-900 overflow-hidden">
@@ -28,10 +27,15 @@ export default function FinalCTA() {
           Every build makes you a better frontend developer.
         </p>
         
-        <button className="group flex items-center gap-4 bg-[#ccff00] text-black px-10 py-5 font-mono text-sm tracking-widest font-bold uppercase transition-all hover:bg-white hover:scale-105">
-          Start Your First Challenge
-          <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-2" />
-        </button>
+        <div className="flex flex-wrap items-center justify-center gap-6">
+          <a href="/sandbox.html?mode=challenge1" className="group flex items-center gap-4 bg-[#ccff00] text-black px-10 py-5 font-mono text-sm tracking-widest font-bold uppercase transition-all hover:bg-white hover:scale-105">
+            Start Challenge #1
+            <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-2" />
+          </a>
+          <a href="/sandbox.html?mode=tutorial" className="group flex items-center gap-4 text-white px-10 py-5 font-mono text-sm tracking-widest font-bold uppercase border border-neutral-800 transition-all hover:border-[#ccff00] hover:scale-105">
+            Tutorial Sandbox
+          </a>
+        </div>
 
       </div>
 
