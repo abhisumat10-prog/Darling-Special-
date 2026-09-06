@@ -1,15 +1,21 @@
 {
-  "name": "temp-app",
+  "name": "darling-special",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "An AI-powered platform for practicing real-world UI engineering.",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "server": "node server.js",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google/genai": "^2.21.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
     "lucide-react": "^1.41.0",
     "motion": "^13.2.0",
     "react": "^19.2.8",
