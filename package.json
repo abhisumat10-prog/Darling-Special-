@@ -1,0 +1,27 @@
+{
+  "name": "darling-special-",
+  "version": "1.0.0",
+  "description": "An AI-powered platform for practicing real-world UI engineering. Build frontend components against real design specs and get automated feedback on visual fidelity, responsiveness, accessibility, and code quality.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhisumat10-prog/Darling-Special-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abhisumat10-prog/Darling-Special-/issues"
+  },
+  "homepage": "https://github.com/abhisumat10-prog/Darling-Special-#readme",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.124.0",
+    "@google/genai": "^2.21.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
+}
