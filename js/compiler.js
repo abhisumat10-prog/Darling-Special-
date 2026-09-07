@@ -31,8 +31,13 @@ class CodeCompilerEngine {
     // Listen for runtime errors from iframe
     window.addEventListener('message', (event) => {
       if (event.data && event.data.type === 'IFRAME_RUNTIME_ERROR') {
-        this.setCompilerStatus('error', 'Runtime Error');
-        this.editorManager.highlightErrorLines('js', [1], event.data.message);
+        const sourceTab = event.data.source === 'jsx' ? 'jsx' : 'js';
+        const sourceLabel = sourceTab === 'jsx' ? 'React Error' : 'JS Error';
+        const errorLine = Number.isInteger(event.data.line) && event.data.line > 0
+          ? event.data.line
+          : 1;
+        this.setCompilerStatus('error', sourceLabel);
+        this.editorManager.highlightErrorLines(sourceTab, [errorLine], event.data.message);
       }
     });
 
@@ -324,10 +329,18 @@ if (jsxError) {
 
   const reactScript = hasReact ? `
     <script type="text/babel">
+      window.__pixelProofRuntimeSource = 'jsx';
       try {
         ${jsx}
       } catch(err) {
-        window.parent.postMessage({ type: 'IFRAME_RUNTIME_ERROR', message: 'React Error: ' + err.message }, '*');
+        window.parent.postMessage({
+          type: 'IFRAME_RUNTIME_ERROR',
+          source: 'jsx',
+          line: err.loc && err.loc.line ? err.loc.line : 1,
+          message: 'React Error: ' + err.message
+        }, '*');
+      } finally {
+        window.__pixelProofRuntimeSource = 'js';
       }
     </scr` + `ipt>
   ` : '';
@@ -349,15 +362,20 @@ if (jsxError) {
     window.addEventListener('error', function(e) {
       window.parent.postMessage({
         type: 'IFRAME_RUNTIME_ERROR',
+        source: window.__pixelProofRuntimeSource || 'js',
+        line: e.lineno || 1,
         message: e.message + ' (Line ' + e.lineno + ')'
       }, '*');
     });
 
     try {
+      window.__pixelProofRuntimeSource = 'js';
       ${js}
     } catch(err) {
       window.parent.postMessage({
         type: 'IFRAME_RUNTIME_ERROR',
+        source: 'js',
+        line: err.lineNumber || 1,
         message: err.message
       }, '*');
     }
