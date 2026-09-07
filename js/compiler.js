@@ -18,13 +18,13 @@ class CodeCompilerEngine {
   init() {
     if (this.submitBtn) {
       this.submitBtn.addEventListener('click', () => {
-        this.compileAndSubmit();
+        this.compileAndSubmit({ submit: true });
       });
     }
 
     if (this.runBtn) {
       this.runBtn.addEventListener('click', () => {
-        this.compileAndSubmit();
+        this.compileAndSubmit({ submit: false });
       });
     }
 
@@ -43,11 +43,11 @@ class CodeCompilerEngine {
 
     // Initial compile on page load
     setTimeout(() => {
-      this.compileAndSubmit(true);
+      this.compileAndSubmit({ submit: false });
     }, 200);
   }
 
-  compileAndSubmit(isInitial = false) {
+  compileAndSubmit({ submit = false } = {}) {
     const buffers = this.editorManager.getCodeBuffers();
 
     // 1. Validate JavaScript Syntax & Multiple Line Errors
@@ -88,13 +88,13 @@ if (jsxError) {
     // Render output into iframe
     this.renderPreview(buffers.html, buffers.css, buffers.js, buffers.jsx);
 
-    // Save submitted progress if in Challenge 1 mode
-    if (this.editorManager.mode === 'challenge') {
+    // Preview runs never save or grade. Only a successful Submit does both.
+    if (submit && this.editorManager.mode === 'challenge') {
       this.editorManager.saveSubmittedCode();
     }
 
     // Notify integration hooks for Persons 2, 3, 4
-    if (!isInitial && window.notifySandboxSubmission) {
+    if (submit && window.notifySandboxSubmission) {
       window.notifySandboxSubmission({
   html: buffers.html,
   css: buffers.css,
@@ -105,7 +105,7 @@ if (jsxError) {
 });
     }
 
-    if (!isInitial) {
+    if (submit) {
       document.dispatchEvent(new CustomEvent('sandbox:submission', {
   detail: {
     html: buffers.html,

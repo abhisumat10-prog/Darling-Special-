@@ -251,7 +251,7 @@
             : `Reset ${activeSpec.title} code back to its starter template and clear saved progress?`;
           if (confirm(msg)) {
             editorManager.resetCode();
-            compilerEngine.compileAndSubmit(true);
+            compilerEngine.compileAndSubmit({ submit: false });
           }
         });
       }
