@@ -79,16 +79,19 @@
       <div class="editor-box">
         <div class="box-header">
           <div class="editor-tabs">
-            <button class="tab-btn active" data-lang="html">
-              <span class="tab-icon">&lt;/&gt;</span> HTML
-            </button>
-            <button class="tab-btn" data-lang="css">
-              <span class="tab-icon">#</span> CSS
-            </button>
-            <button class="tab-btn" data-lang="js">
-              <span class="tab-icon">JS</span> JavaScript
-            </button>
-          </div>
+  <button class="tab-btn active" data-lang="html">
+    <span class="tab-icon">&lt;/&gt;</span> HTML
+  </button>
+  <button class="tab-btn" data-lang="css">
+    <span class="tab-icon">#</span> CSS
+  </button>
+  <button class="tab-btn" data-lang="js">
+    <span class="tab-icon">JS</span> JavaScript
+  </button>
+  <button class="tab-btn" data-lang="jsx">
+    <span class="tab-icon">JSX</span> React
+  </button>
+</div>
           <span style="font-size: 0.72rem; color: #7A9185; font-family: var(--font-mono);">Tab Size: 2 spaces</span>
         </div>
 
@@ -172,11 +175,13 @@
   </div>
 
   <!-- Script Modules -->
-  <script src="js/challenges.js"></script>
-  <script src="js/editor.js"></script>
-  <script src="js/compiler.js"></script>
-  <script src="js/spec-viewer.js"></script>
-  <script src="js/integration-hooks.js"></script>
+  <!-- Script Modules -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="js/challenges.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/compiler.js"></script>
+<script src="js/spec-viewer.js"></script>
+<script src="js/integration-hooks.js"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
