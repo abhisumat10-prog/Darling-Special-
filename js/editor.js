@@ -121,7 +121,7 @@ class CodeEditorManager {
           this.codeBuffers.css = parsed.css || this.challengeSpec.starterCode.css;
           this.codeBuffers.js = parsed.js || this.challengeSpec.starterCode.js;
           console.log(`[Editor] Restored saved code attempt for ${this.challengeSpec.title}.`);
-        } catch (e) {
+        } catch {
           this.loadDefaultChallengeCode();
         }
       } else {

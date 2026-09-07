@@ -7,6 +7,7 @@ export async function signUp(email: string, password: string, displayName: strin
     password,
     options: {
       data: { display_name: displayName.trim() || 'PixelProof learner' },
+      emailRedirectTo: `${window.location.origin}/auth`,
     },
   })
 
