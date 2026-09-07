@@ -89,6 +89,11 @@ Respond with ONLY valid JSON, no markdown, no preamble, in this exact shape:
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error("Grading error:", message);
+    if (/429|RESOURCE_EXHAUSTED|quota exceeded/i.test(message)) {
+      return res.status(429).json({
+        error: "Gemini's free grading limit has been reached. Please wait and try Grade Again later.",
+      });
+    }
     return res.status(500).json({ error: "AI grading failed. Please retry." });
   }
 }

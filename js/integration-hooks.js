@@ -193,6 +193,10 @@ window.setupSandboxGrading = function setupSandboxGrading(activeSpec) {
     } catch (error) {
       title.textContent = 'Could not complete AI grading';
       message.textContent = `${error.message}. Confirm the grading server and GEMINI_API_KEY are available.`;
+      scores.replaceChildren();
+      scores.hidden = true;
+      reasoning.textContent = '';
+      reasoning.hidden = true;
       retry.hidden = false;
     } finally {
       submitButton.disabled = false;
