@@ -76,13 +76,13 @@
         <div class="box-header">
           <div class="editor-tabs">
             <button class="tab-btn active" data-lang="html">
-              <span class="tab-icon">&lt;/&gt;</span> HTML
+              <span class="tab-icon">&lt;/&gt;</span> HTML<span class="tab-error-badge" id="badge-html"></span>
             </button>
             <button class="tab-btn" data-lang="css">
-              <span class="tab-icon">#</span> CSS
+              <span class="tab-icon">#</span> CSS<span class="tab-error-badge" id="badge-css"></span>
             </button>
             <button class="tab-btn" data-lang="js">
-              <span class="tab-icon">js</span> JavaScript
+              <span class="tab-icon">js</span> JavaScript<span class="tab-error-badge" id="badge-js"></span>
             </button>
           </div>
           <span style="font-size: 0.75rem; color: var(--text-muted);">Tab Size: 2 spaces</span>
@@ -93,7 +93,10 @@
             <div id="line-numbers" class="line-numbers">
               <!-- Line numbers dynamically populated -->
             </div>
-            <textarea id="code-textarea" class="code-textarea" spellcheck="false" autocomplete="off"></textarea>
+            <div class="editor-overlay-wrapper">
+              <pre id="code-overlay" class="code-highlight-overlay" aria-hidden="true"></pre>
+              <textarea id="code-textarea" class="code-textarea" spellcheck="false" autocomplete="off"></textarea>
+            </div>
           </div>
         </div>
 

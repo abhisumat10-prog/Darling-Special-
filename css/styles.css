@@ -564,6 +564,23 @@ body {
   font-weight: 800;
 }
 
+.tab-btn.tab-error {
+  color: #f87171 !important;
+  background-color: rgba(239, 68, 68, 0.15) !important;
+  border-top: 2px solid #ef4444 !important;
+}
+
+.tab-error-badge {
+  color: #ef4444;
+  font-weight: 800;
+  font-size: 0.75rem;
+  margin-left: 0.2rem;
+}
+
+.tab-btn.tab-error .tab-error-badge {
+  color: #fca5a5;
+}
+
 .tab-icon {
   font-size: 0.8rem;
   color: var(--accent-yellow);
@@ -586,23 +603,100 @@ body {
   overflow: hidden;
 }
 
+/* Editor Overlay Wrapper & Precise Cursor Sync */
+.editor-overlay-wrapper {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.code-highlight-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0 !important;
+  padding: 1rem !important;
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, 'Courier New', monospace !important;
+  font-size: 14px !important;
+  line-height: 22px !important;
+  letter-spacing: 0px !important;
+  word-spacing: 0px !important;
+  tab-size: 2 !important;
+  -moz-tab-size: 2 !important;
+  white-space: pre !important;
+  word-wrap: normal !important;
+  overflow-wrap: normal !important;
+  color: #d4d4d4;
+  background-color: var(--bg-editor);
+  pointer-events: none;
+  overflow: hidden;
+  box-sizing: border-box !important;
+  border: none !important;
+  outline: none !important;
+}
+
+.code-textarea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0 !important;
+  padding: 1rem !important;
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, 'Courier New', monospace !important;
+  font-size: 14px !important;
+  line-height: 22px !important;
+  letter-spacing: 0px !important;
+  word-spacing: 0px !important;
+  tab-size: 2 !important;
+  -moz-tab-size: 2 !important;
+  white-space: pre !important;
+  word-wrap: normal !important;
+  overflow-wrap: normal !important;
+  background: transparent !important;
+  color: transparent !important;
+  caret-color: #ffffff !important;
+  border: none !important;
+  outline: none !important;
+  resize: none;
+  overflow-y: auto;
+  overflow-x: auto;
+  box-sizing: border-box !important;
+  z-index: 2;
+}
+
+.code-textarea::selection {
+  background-color: rgba(204, 255, 0, 0.25) !important;
+  color: transparent !important;
+}
+
 .line-numbers {
   width: 3.5rem;
   background-color: #050606;
   padding-top: 1rem;
   color: #404040;
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  line-height: 1.6;
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, 'Courier New', monospace !important;
+  font-size: 14px !important;
+  line-height: 22px !important;
   text-align: right;
   padding-right: 0.75rem;
   user-select: none;
   border-right: 1px solid var(--border-color);
   overflow: hidden;
+  box-sizing: border-box !important;
 }
 
 .line-number-item {
   display: block;
+  height: 22px !important;
+  line-height: 22px !important;
+  position: relative;
+  cursor: pointer;
+  box-sizing: border-box !important;
 }
 
 /* Multiple Line Error Highlighting (Dull Red) */
@@ -613,22 +707,68 @@ body {
   border-left: 3px solid var(--accent-error);
 }
 
-.code-textarea {
-  flex: 1;
-  background-color: var(--bg-editor);
-  color: #f5f5f5;
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  line-height: 1.6;
-  border: none;
-  outline: none;
-  padding: 1rem;
-  resize: none;
-  white-space: pre;
-  tab-size: 2;
-  overflow-y: auto;
-  overflow-x: auto;
+.code-line {
+  position: relative;
+  height: 22px !important;
+  line-height: 22px !important;
+  box-sizing: border-box !important;
+  white-space: pre !important;
 }
+
+.code-line.code-line-error {
+  background-color: rgba(239, 68, 68, 0.15);
+  border-radius: 2px;
+}
+
+.error-inline-marker {
+  position: absolute;
+  right: 1rem;
+  top: 0;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 5;
+}
+
+/* Tooltip Popup on Inline Marker and Gutter */
+.error-tooltip-content, .gutter-tooltip {
+  display: none;
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1e1b1e;
+  color: #fca5a5;
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  padding: 0.4rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  pointer-events: none;
+}
+
+.error-inline-marker:hover .error-tooltip-content,
+.line-number-item.error-gutter:hover .gutter-tooltip {
+  display: block;
+}
+
+/* VS Code Dark+ Syntax Tokens */
+.token-comment { color: #6a9955; font-style: italic; }
+.token-string { color: #ce9178; }
+.token-keyword { color: #569cd6; font-weight: 600; }
+.token-function { color: #dcdcaa; }
+.token-number { color: #b5cea8; }
+.token-tag { color: #569cd6; }
+.token-attr { color: #9cdcfe; }
+.token-property { color: #9cdcfe; }
+.token-class { color: #d7ba7d; }
+.token-punctuation { color: #d4d4d4; }
 
 /* Error Banner & Multiple Line Error Details */
 .error-banner {

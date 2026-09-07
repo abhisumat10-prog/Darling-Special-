@@ -1,7 +1,7 @@
 /**
  * Compiler & Multi-Line Error Detection Engine (Person 1)
- * Detects multiple lines of broken code upon SUBMIT, highlights them in dull red,
- * and displays formatted line numbers & error messages.
+ * Evaluates HTML, CSS, and JavaScript syntax across all three tabs upon SUBMIT,
+ * building multi-file error maps for line-specific highlighting and tab badges.
  */
 
 class CodeCompilerEngine {
@@ -32,7 +32,11 @@ class CodeCompilerEngine {
     window.addEventListener('message', (event) => {
       if (event.data && event.data.type === 'IFRAME_RUNTIME_ERROR') {
         this.setCompilerStatus('error', 'Runtime Error');
-        this.editorManager.highlightErrorLines('js', [1], event.data.message);
+        const runtimeErr = [{ line: 1, message: event.data.message }];
+        this.editorManager.applyCompilerResults({
+          ...this.editorManager.tabErrors,
+          js: [...(this.editorManager.tabErrors.js || []), ...runtimeErr]
+        });
       }
     });
 
@@ -45,32 +49,27 @@ class CodeCompilerEngine {
   compileAndSubmit(isInitial = false) {
     const buffers = this.editorManager.getCodeBuffers();
 
-    // 1. Validate JavaScript Syntax & Multiple Line Errors
-    const jsError = this.validateJavaScript(buffers.js);
-    if (jsError) {
-      this.setCompilerStatus('error', 'JS Error');
-      this.editorManager.highlightErrorLines('js', jsError.lines, jsError.message);
+    // Validate HTML, CSS, and JS simultaneously
+    const htmlErrors = this.validateHTML(buffers.html);
+    const cssErrors = this.validateCSS(buffers.css);
+    const jsErrors = this.validateJavaScript(buffers.js);
+
+    const tabErrors = {
+      html: htmlErrors,
+      css: cssErrors,
+      js: jsErrors
+    };
+
+    // Apply error maps and tab badges in editor
+    this.editorManager.applyCompilerResults(tabErrors);
+
+    const totalErrors = htmlErrors.length + cssErrors.length + jsErrors.length;
+
+    if (totalErrors > 0) {
+      this.setCompilerStatus('error', `${totalErrors} Error${totalErrors > 1 ? 's' : ''}`);
       return false;
     }
 
-    // 2. Validate HTML Structure & Multiple Line Errors
-    const htmlError = this.validateHTML(buffers.html);
-    if (htmlError) {
-      this.setCompilerStatus('error', 'HTML Error');
-      this.editorManager.highlightErrorLines('html', htmlError.lines, htmlError.message);
-      return false;
-    }
-
-    // 3. Validate CSS & Multiple Line Errors
-    const cssError = this.validateCSS(buffers.css);
-    if (cssError) {
-      this.setCompilerStatus('error', 'CSS Error');
-      this.editorManager.highlightErrorLines('css', cssError.lines, cssError.message);
-      return false;
-    }
-
-    // Clear previous errors if all syntax is valid
-    this.editorManager.clearErrorHighlights();
     this.setCompilerStatus('success', 'Compiled Successfully');
 
     // Render output into iframe
@@ -96,141 +95,134 @@ class CodeCompilerEngine {
   }
 
   validateJavaScript(jsCode) {
-    if (!jsCode || !jsCode.trim()) return null;
+    if (!jsCode || !jsCode.trim()) return [];
+    const errors = [];
+    const lines = jsCode.split('\n');
 
-    const errorLines = new Set();
-    let primaryMessage = '';
-
-    // First check overall code execution/syntax
+    let globalSyntaxErr = null;
     try {
       new Function(jsCode);
     } catch (e) {
-      primaryMessage = e.message || 'JavaScript Syntax Error';
+      globalSyntaxErr = e;
     }
 
-    if (!primaryMessage) return null; // No errors found
+    if (globalSyntaxErr) {
+      let openBraces = 0, openParens = 0, openBrackets = 0;
+      let inString = false, stringChar = '';
+      let foundSpecificLine = false;
 
-    // Line-by-line & block inspection for multiple line error detection
-    const lines = jsCode.split('\n');
-    let openBraces = 0;
-    let openParens = 0;
-    let inString = false;
-    let stringChar = '';
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const trimmed = line.trim();
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-
-      // Check unclosed quotes or invalid characters per line
-      for (let j = 0; j < line.length; j++) {
-        const char = line[j];
-        if ((char === '"' || char === "'" || char === '`') && (j === 0 || line[j-1] !== '\\')) {
+        // String tracking per line
+        for (let j = 0; j < line.length; j++) {
+          const char = line[j];
+          if ((char === '"' || char === "'" || char === '`') && (j === 0 || line[j - 1] !== '\\')) {
+            if (!inString) {
+              inString = true;
+              stringChar = char;
+            } else if (char === stringChar) {
+              inString = false;
+            }
+          }
           if (!inString) {
-            inString = true;
-            stringChar = char;
-          } else if (char === stringChar) {
-            inString = false;
+            if (char === '{') openBraces++;
+            if (char === '}') openBraces--;
+            if (char === '(') openParens++;
+            if (char === ')') openParens--;
+            if (char === '[') openBrackets++;
+            if (char === ']') openBrackets--;
           }
         }
-        if (!inString) {
-          if (char === '{') openBraces++;
-          if (char === '}') openBraces--;
-          if (char === '(') openParens++;
-          if (char === ')') openParens--;
+
+        if (inString && stringChar !== '`') {
+          errors.push({ line: i + 1, message: `Unclosed string literal (${stringChar})` });
+          foundSpecificLine = true;
         }
-      }
 
-      if (inString && stringChar !== '`') {
-        errorLines.add(i + 1); // Unclosed string on line
-      }
-
-      // Check line independently with Function test
-      if (line.trim() && !line.trim().startsWith('//')) {
-        try {
-          new Function(line);
-        } catch(err) {
-          // If single line has syntax error (e.g. const x = ;)
-          if (err.message.includes('Unexpected') || err.message.includes('Missing')) {
-            errorLines.add(i + 1);
+        if (trimmed && !trimmed.startsWith('//') && !trimmed.startsWith('/*')) {
+          try {
+            new Function(trimmed);
+          } catch (lineErr) {
+            if (lineErr.message.includes('Unexpected') || lineErr.message.includes('Missing')) {
+              errors.push({ line: i + 1, message: `JS Syntax Error: ${lineErr.message}` });
+              foundSpecificLine = true;
+            }
           }
         }
       }
+
+      if (openBraces !== 0 || openParens !== 0 || openBrackets !== 0) {
+        errors.push({ line: lines.length, message: 'Unmatched brackets or braces in JavaScript code' });
+        foundSpecificLine = true;
+      }
+
+      if (!foundSpecificLine) {
+        const lineMatch = (globalSyntaxErr.message || '').match(/(\d+)/);
+        const lineNum = lineMatch ? Math.min(parseInt(lineMatch[1], 10), lines.length) : 1;
+        errors.push({ line: lineNum, message: globalSyntaxErr.message || 'JavaScript Syntax Error' });
+      }
     }
 
-    if (openBraces !== 0 || openParens !== 0) {
-      errorLines.add(lines.length);
-    }
-
-    // Ensure at least one line is captured
-    if (errorLines.size === 0) {
-      const match = primaryMessage.match(/(\d+)/);
-      errorLines.add(match ? parseInt(match[1], 10) : 1);
-    }
-
-    return {
-      lines: Array.from(errorLines),
-      message: primaryMessage
-    };
+    return errors;
   }
 
   validateHTML(htmlCode) {
-    if (!htmlCode || !htmlCode.trim()) return null;
+    if (!htmlCode || !htmlCode.trim()) return [];
+    const errors = [];
+    const lines = htmlCode.split('\n');
+
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlCode, 'text/html');
     const parserErrors = doc.querySelectorAll('parsererror');
 
-    const errorLines = new Set();
-    let primaryMessage = '';
-
     if (parserErrors.length > 0) {
-      primaryMessage = parserErrors[0].textContent.replace(/Below is a rendering of the page.*/s, '').trim();
-      const lineMatch = primaryMessage.match(/line\s+(\d+)/i);
-      if (lineMatch) errorLines.add(parseInt(lineMatch[1], 10));
+      const rawMsg = parserErrors[0].textContent.replace(/Below is a rendering of the page.*/s, '').trim();
+      const lineMatch = rawMsg.match(/line\s+(\d+)/i);
+      const errLine = lineMatch ? Math.min(parseInt(lineMatch[1], 10), lines.length) : 1;
+      errors.push({ line: errLine, message: `HTML Parser Error: ${rawMsg}` });
     }
 
-    // Detect unclosed HTML tags line numbers
-    const lines = htmlCode.split('\n');
     const tagStack = [];
+    const selfClosing = ['img', 'br', 'hr', 'input', 'meta', 'link', 'source', 'embed'];
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      const tagMatches = line.matchAll(/<\/?([a-zA-Z0-9]+)[^>]*>/g);
+      const tagMatches = line.matchAll(/<\/?([a-zA-Z0-9-]+)[^>]*>/g);
+
       for (const match of tagMatches) {
         const fullTag = match[0];
         const tagName = match[1].toLowerCase();
-        if (['img', 'br', 'hr', 'input', 'meta', 'link'].includes(tagName)) continue;
+
+        if (selfClosing.includes(tagName) || fullTag.endsWith('/>')) continue;
 
         if (fullTag.startsWith('</')) {
           if (tagStack.length > 0 && tagStack[tagStack.length - 1].name === tagName) {
             tagStack.pop();
           } else {
-            errorLines.add(i + 1); // Mismatched closing tag line
+            errors.push({ line: i + 1, message: `Mismatched closing tag </${tagName}>` });
           }
-        } else if (!fullTag.endsWith('/>')) {
+        } else {
           tagStack.push({ name: tagName, line: i + 1 });
         }
       }
     }
 
-    // Add unclosed opening tags lines
-    tagStack.forEach(item => errorLines.add(item.line));
+    tagStack.forEach(item => {
+      errors.push({ line: item.line, message: `Unclosed HTML tag <${item.name}>` });
+    });
 
-    if (errorLines.size > 0 || primaryMessage) {
-      return {
-        lines: errorLines.size > 0 ? Array.from(errorLines) : [1],
-        message: primaryMessage || 'HTML Validation Error: Unclosed or mismatched tags detected.'
-      };
-    }
-
-    return null;
+    return errors;
   }
 
   validateCSS(cssCode) {
-    if (!cssCode || !cssCode.trim()) return null;
+    if (!cssCode || !cssCode.trim()) return [];
+    const errors = [];
+    const lines = cssCode.split('\n');
 
-    const errorLines = new Set();
     let openBraces = 0;
     let blockStartLine = 1;
-    const lines = cssCode.split('\n');
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -243,29 +235,21 @@ class CodeCompilerEngine {
           openBraces--;
         }
       }
+
       if (openBraces < 0) {
-        errorLines.add(i + 1);
+        errors.push({ line: i + 1, message: 'CSS Syntax Error: Unexpected closing brace "}"' });
         openBraces = 0;
       }
     }
 
     if (openBraces > 0) {
-      // Highlight lines from blockStartLine to end
-      for (let l = blockStartLine; l <= lines.length; l++) {
-        errorLines.add(l);
-      }
+      errors.push({
+        line: blockStartLine,
+        message: `CSS Error: Missing closing brace "}" for block starting on line ${blockStartLine}`
+      });
     }
 
-    if (errorLines.size > 0) {
-      return {
-        lines: Array.from(errorLines),
-        message: openBraces > 0 
-          ? `CSS Error: Missing closing brace "}" for rule starting on line ${blockStartLine}.`
-          : 'CSS Syntax Error: Unexpected closing brace "}".'
-      };
-    }
-
-    return null;
+    return errors;
   }
 
   renderPreview(html, css, js) {
