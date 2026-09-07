@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -86,10 +86,10 @@
               <span class="tab-icon">#</span> CSS
             </button>
             <button class="tab-btn" data-lang="js">
-              <span class="tab-icon">js</span> JavaScript
+              <span class="tab-icon">JS</span> JavaScript
             </button>
           </div>
-          <span style="font-size: 0.75rem; color: var(--text-muted);">Tab Size: 2 spaces</span>
+          <span style="font-size: 0.72rem; color: #7A9185; font-family: var(--font-mono);">Tab Size: 2 spaces</span>
         </div>
 
         <div class="editor-container">
@@ -108,14 +108,30 @@
       <!-- Right Box: Live Output Preview -->
       <div class="output-box">
         <div class="box-header">
-          <span style="font-size: 0.85rem; font-weight: 600; color: #fff;">
+          <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-main); font-family: var(--font-sans);">
             Live Preview Output
           </span>
 
           <div class="output-viewport-bar">
-            <button id="view-desktop" class="viewport-btn active">Desktop (100%)</button>
-            <button id="view-tablet" class="viewport-btn">Tablet (768px)</button>
-            <button id="view-mobile" class="viewport-btn">Mobile (375px)</button>
+            <button id="view-desktop" class="viewport-btn active" aria-label="Desktop (100%)" title="Desktop (100%)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg>
+            </button>
+            <button id="view-tablet" class="viewport-btn" aria-label="Tablet (768px)" title="Tablet (768px)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                <line x1="12" y1="18" x2="12.01" y2="18"></line>
+              </svg>
+            </button>
+            <button id="view-mobile" class="viewport-btn" aria-label="Mobile (375px)" title="Mobile (375px)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                <line x1="12" y1="18" x2="12.01" y2="18"></line>
+              </svg>
+            </button>
           </div>
         </div>
 
