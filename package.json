@@ -9,6 +9,7 @@
     "server": "node server.js",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
+    "test:security": "node --test api/grade.security.test.js",
     "preview": "vite preview"
   },
   "dependencies": {

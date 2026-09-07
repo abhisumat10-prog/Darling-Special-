@@ -72,38 +72,18 @@ window.getFigmaSpecUrl = function() {
 
 console.log('[Sandbox Integration API] Ready for Persons 2, 3, 4, 5 (with Figma Token Support)');
 
-function runSubmissionChecks(code) {
-  const documentNode = new DOMParser().parseFromString(code.html, 'text/html');
-  const violations = [];
-
-  documentNode.querySelectorAll('img:not([alt])').forEach(() => {
-    violations.push({ id: 'image-alt', description: 'Images must include alt text.' });
-  });
-  documentNode.querySelectorAll('button').forEach(button => {
-    if (!button.textContent.trim() && !button.getAttribute('aria-label')) {
-      violations.push({ id: 'button-name', description: 'Buttons must have an accessible name.' });
+function getSupabaseAccessToken() {
+  for (let index = 0; index < localStorage.length; index += 1) {
+    const key = localStorage.key(index);
+    if (!key || !/^sb-.*-auth-token$/.test(key)) continue;
+    try {
+      const session = JSON.parse(localStorage.getItem(key));
+      if (typeof session?.access_token === 'string') return session.access_token;
+    } catch {
+      // Ignore unrelated or expired storage entries. The server still validates the token.
     }
-  });
-  documentNode.querySelectorAll('input').forEach(input => {
-    const id = input.id;
-    const hasLabel = id && documentNode.querySelector(`label[for="${CSS.escape(id)}"]`);
-    if (!hasLabel && !input.getAttribute('aria-label') && !input.getAttribute('aria-labelledby')) {
-      violations.push({ id: 'form-label', description: 'Inputs must have an accessible label.' });
-    }
-  });
-
-  const dialogs = documentNode.querySelectorAll('[role="dialog"], .modal-box');
-  dialogs.forEach(dialog => {
-    if (dialog.getAttribute('role') !== 'dialog' || dialog.getAttribute('aria-modal') !== 'true') {
-      violations.push({ id: 'dialog-aria', description: 'Dialogs need role="dialog" and aria-modal="true".' });
-    }
-  });
-
-  const source = `${code.html}\n${code.css}\n${code.js}\n${code.jsx || ''}`;
-  const todoCount = (source.match(/TODO/gi) || []).length;
-  const visualDiffScore = Math.max(45, Math.min(92, 82 - todoCount * 6));
-
-  return { violations, visualDiffScore };
+  }
+  return null;
 }
 
 window.setupSandboxGrading = function setupSandboxGrading(activeSpec) {
@@ -115,7 +95,6 @@ window.setupSandboxGrading = function setupSandboxGrading(activeSpec) {
   const retry = document.getElementById('grading-retry');
   const back = document.getElementById('grading-back');
   const submitButton = document.getElementById('btn-submit');
-  const evaluationStorageKey = `${activeSpec.id}_latest_evaluation`;
   let latestSubmission = null;
 
   const revealResults = (scrollToResults = true) => {
@@ -154,7 +133,7 @@ window.setupSandboxGrading = function setupSandboxGrading(activeSpec) {
     const savedLabel = savedAt
       ? ` Latest saved evaluation from ${new Date(savedAt).toLocaleString()}.`
       : '';
-    message.textContent = `${checks.violations.length} preliminary accessibility issue(s) found.${savedLabel}`;
+    message.textContent = `${checks.violations.length} server-checked accessibility issue(s) found.${savedLabel}`;
     renderScores(result);
     reasoning.textContent = result.reasoning || 'The grading agent returned no written feedback.';
     reasoning.hidden = false;
@@ -170,29 +149,33 @@ window.setupSandboxGrading = function setupSandboxGrading(activeSpec) {
     retry.hidden = true;
     submitButton.disabled = true;
 
-    const checks = runSubmissionChecks(submission);
-    const combinedCode = `HTML:\n${submission.html}\n\nCSS:\n${submission.css}\n\nJavaScript:\n${submission.js}\n\nReact / JSX:\n${submission.jsx || '(No React code submitted)'}`;
-
     try {
+      const accessToken = getSupabaseAccessToken();
+      if (!accessToken) throw new Error('Sign in before submitting code for grading');
       const response = await fetch('/api/grade', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
         body: JSON.stringify({
-          code: combinedCode,
-          visualDiffScore: checks.visualDiffScore,
-          a11yViolations: checks.violations,
-          challengeBrief: activeSpec.specMarkdown || activeSpec.description
+          challengeId: activeSpec.id,
+          submission: {
+            html: submission.html || '',
+            css: submission.css || '',
+            js: submission.js || '',
+            jsx: submission.jsx || ''
+          }
         })
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || `Grading failed (${response.status})`);
 
-      const savedAt = new Date().toISOString();
+      const checks = { violations: result.checks?.accessibilityViolations || [] };
       renderEvaluation(result, checks);
-      localStorage.setItem(evaluationStorageKey, JSON.stringify({ result, checks, savedAt }));
     } catch (error) {
       title.textContent = 'Could not complete AI grading';
-      message.textContent = `${error.message}. Confirm the grading server and GEMINI_API_KEY are available.`;
+      message.textContent = error.message;
       scores.replaceChildren();
       scores.hidden = true;
       reasoning.textContent = '';
@@ -212,17 +195,6 @@ window.setupSandboxGrading = function setupSandboxGrading(activeSpec) {
     grade(latestSubmission || window.getSandboxSubmission());
   });
 
-  const savedEvaluation = localStorage.getItem(evaluationStorageKey);
-  if (savedEvaluation) {
-    try {
-      const parsed = JSON.parse(savedEvaluation);
-      renderEvaluation(parsed.result, parsed.checks, parsed.savedAt);
-      revealResults(false);
-    } catch (error) {
-      localStorage.removeItem(evaluationStorageKey);
-      console.warn('[Sandbox Evaluation] Ignored invalid saved evaluation.', error);
-    }
-  }
 };
 
 document.addEventListener('sandbox:spec-ready', event => {
