@@ -10,7 +10,7 @@ create table if not exists public.profiles (
 create table if not exists public.challenge_attempts (
   id bigint generated always as identity primary key,
   user_id uuid not null references auth.users(id) on delete cascade,
-  challenge_id text not null check (challenge_id ~ '^challenge[1-6]$'),
+  challenge_id text not null check (challenge_id ~ '^challenge(?:[1-9]|1[0-4])$'),
   visual_score smallint not null check (visual_score between 0 and 100),
   responsive_score smallint not null check (responsive_score between 0 and 100),
   accessibility_score smallint not null check (accessibility_score between 0 and 100),
