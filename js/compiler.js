@@ -300,8 +300,18 @@ if (jsxError) {
   validateJSX(jsxCode) {
   if (!jsxCode || !jsxCode.trim()) return null;
 
+  if (!window.Babel || typeof window.Babel.transform !== 'function') {
+    return {
+      lines: [1],
+      message: 'React compiler failed to load. Refresh the page and try again.'
+    };
+  }
+
   try {
-    Babel.transform(jsxCode, { presets: ['react'] });
+    window.Babel.transform(jsxCode, {
+      presets: ['react'],
+      parserOpts: { sourceType: 'module' }
+    });
   } catch (e) {
     // Babel errors usually include a line number in e.loc
     const line = e.loc && e.loc.line ? e.loc.line : 1;
@@ -330,6 +340,7 @@ if (jsxError) {
   const reactScript = hasReact ? `
     <script type="text/babel">
       window.__pixelProofRuntimeSource = 'jsx';
+      window.__pixelProofHasReact = true;
       try {
         ${jsx}
       } catch(err) {
@@ -359,6 +370,25 @@ if (jsxError) {
   ${html}
   ${reactMount}
   <script>
+    const originalConsoleError = console.error.bind(console);
+    console.error = function(...args) {
+      originalConsoleError(...args);
+      const message = args.map(value => {
+        if (value instanceof Error) return value.message;
+        return typeof value === 'string' ? value : '';
+      }).filter(Boolean).join(' ');
+      const looksLikeReactError = window.__pixelProofHasReact &&
+        /(react|component|error boundary|render|hook)/i.test(message);
+      if (looksLikeReactError) {
+        window.parent.postMessage({
+          type: 'IFRAME_RUNTIME_ERROR',
+          source: 'jsx',
+          line: 1,
+          message: 'React Error: ' + message
+        }, '*');
+      }
+    };
+
     window.addEventListener('error', function(e) {
       window.parent.postMessage({
         type: 'IFRAME_RUNTIME_ERROR',

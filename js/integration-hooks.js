@@ -8,7 +8,7 @@ window.sandboxListeners = [];
 
 /**
  * Register a submission callback function
- * @param {Function} callback - Function receiving { html, css, js, timestamp }
+ * @param {Function} callback - Function receiving { html, css, js, jsx, timestamp }
  */
 window.onSandboxSubmit = function(callback) {
   if (typeof callback === 'function') {
@@ -38,7 +38,7 @@ window.getSandboxSubmission = function() {
   if (window.editorManagerInstance) {
     return window.editorManagerInstance.getCodeBuffers();
   }
-  return { html: '', css: '', js: '' };
+  return { html: '', css: '', js: '', jsx: '' };
 };
 
 /**
@@ -99,7 +99,7 @@ function runSubmissionChecks(code) {
     }
   });
 
-  const source = `${code.html}\n${code.css}\n${code.js}`;
+  const source = `${code.html}\n${code.css}\n${code.js}\n${code.jsx || ''}`;
   const todoCount = (source.match(/TODO/gi) || []).length;
   const visualDiffScore = Math.max(45, Math.min(92, 82 - todoCount * 6));
 
@@ -171,7 +171,7 @@ window.setupSandboxGrading = function setupSandboxGrading(activeSpec) {
     submitButton.disabled = true;
 
     const checks = runSubmissionChecks(submission);
-    const combinedCode = `HTML:\n${submission.html}\n\nCSS:\n${submission.css}\n\nJavaScript:\n${submission.js}`;
+    const combinedCode = `HTML:\n${submission.html}\n\nCSS:\n${submission.css}\n\nJavaScript:\n${submission.js}\n\nReact / JSX:\n${submission.jsx || '(No React code submitted)'}`;
 
     try {
       const response = await fetch('/api/grade', {
