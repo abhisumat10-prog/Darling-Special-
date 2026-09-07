@@ -10,7 +10,7 @@ import Footer from "../components/landing/Footer";
 
 export default function LandingPage() {
   return (
-    <div className="bg-[#F7F5EE] min-h-screen text-[#233E31] selection:bg-[#2D4A3E] selection:text-[#F7F5EE]">
+    <div className="bg-[var(--bg-base)] min-h-screen text-[var(--text-primary)] selection:bg-[var(--accent-primary)] selection:text-[var(--accent-text)] transition-colors duration-200">
       <Navbar />
       <main>
         {/* 1. Hero */}

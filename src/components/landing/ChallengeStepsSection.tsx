@@ -26,11 +26,11 @@ const steps = [
 
 export default function ChallengeStepsSection() {
   return (
-    <section className="bg-[#EDE9DE] py-20 md:py-24 border-y border-[#E0DAC9]">
+    <section className="bg-[var(--bg-surface-secondary)] py-20 md:py-24 border-y border-[var(--border-subtle)] transition-colors duration-250">
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col items-center text-center">
         
         {/* Subtle pill dot indicator */}
-        <div className="w-6 h-2 rounded-full bg-[#D7D0BF] mb-4"></div>
+        <div className="w-6 h-2 rounded-full bg-[var(--border-subtle)] mb-4"></div>
 
         {/* Section Headline */}
         <motion.h2 
@@ -38,13 +38,13 @@ export default function ChallengeStepsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#233E31] mb-4"
+          className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--text-primary)] mb-4"
         >
           Challenge yourself. Build better UI.
         </motion.h2>
 
         {/* Subtitle */}
-        <p className="text-[#556E61] text-sm sm:text-base max-w-xl mx-auto mb-14">
+        <p className="text-[var(--text-secondary)] text-sm sm:text-base max-w-xl mx-auto mb-14">
           Every build is a structured checkpoint designed to elevate your eye for detail.
         </p>
 
@@ -58,19 +58,19 @@ export default function ChallengeStepsSection() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
               whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className={`p-6 sm:p-7 rounded-2xl border text-left transition-all duration-200 ${
+              className={`p-6 sm:p-7 rounded-2xl border text-left transition-all duration-250 ${
                 idx === 1 
-                  ? "bg-[#F7F5EE] border-[#4A6E5C] shadow-sm" 
-                  : "bg-[#F7F5EE]/80 border-[#DDD7C7] hover:border-[#B5AC98]"
+                  ? "bg-[var(--bg-card)] border-[var(--border-strong)] shadow-sm" 
+                  : "bg-[var(--bg-card)] border-[var(--border-subtle)] hover:border-[var(--border-strong)]"
               }`}
             >
-              <div className="font-serif text-3xl font-bold text-[#B97B58] mb-3">
+              <div className="font-serif text-3xl font-bold text-[var(--accent-amber)] mb-3">
                 {step.num}
               </div>
-              <h3 className="font-mono text-xs tracking-wider uppercase font-bold text-[#233E31] mb-2">
+              <h3 className="font-mono text-xs tracking-wider uppercase font-bold text-[var(--text-primary)] mb-2">
                 {step.title}
               </h3>
-              <p className="text-xs text-[#556E61] leading-relaxed">
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                 {step.desc}
               </p>
             </motion.div>
@@ -86,7 +86,7 @@ export default function ChallengeStepsSection() {
         >
           <a
             href="/sandbox.html?mode=challenge1"
-            className="inline-flex items-center gap-2 bg-[#2D4A3E] text-[#F7F5EE] px-7 py-3.5 rounded-full text-sm font-semibold hover:bg-[#1E332A] transition-all hover:scale-[1.02] shadow-sm"
+            className="inline-flex items-center gap-2 bg-[var(--accent-primary)] text-[var(--accent-text)] px-7 py-3.5 rounded-full text-sm font-semibold hover:bg-[var(--accent-hover)] transition-all hover:scale-[1.02] shadow-sm"
           >
             Start Your First Challenge
             <ArrowRight className="w-4 h-4" />
