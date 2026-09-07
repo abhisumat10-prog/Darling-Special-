@@ -1,140 +1,98 @@
-import { useRef } from 'react';
-import { motion, useScroll, useTransform, MotionValue } from 'motion/react';
-import { CheckCircle2, AlertTriangle } from 'lucide-react';
+import { motion } from 'motion/react';
+import { CheckCircle2, AlertTriangle, Check } from 'lucide-react';
 
-function FeedbackItem({ 
-  icon: Icon, 
-  text, 
-  progress, 
-  index, 
-  isWarning = false 
-}: { 
-  icon: any, 
-  text: string, 
-  progress: MotionValue<number>, 
-  index: number,
-  isWarning?: boolean
-}) {
-  // Items reveal early and rapidly: starting from 0.02 to 0.26
-  const start = 0.02 + (index * 0.05);
-  const opacity = useTransform(progress, [start, start + 0.05], [0.2, 1]);
-  const x = useTransform(progress, [start, start + 0.05], [-8, 0]);
-
-  return (
-    <motion.div 
-      style={{ opacity, x }} 
-      className="flex items-start gap-3.5 p-3 border border-neutral-900 bg-[#080909]"
-    >
-      <Icon className={`w-4 h-4 mt-0.5 shrink-0 ${isWarning ? 'text-yellow-500' : 'text-[#ccff00]'}`} />
-      <p className="text-neutral-300 text-xs md:text-sm leading-relaxed">{text}</p>
-    </motion.div>
-  );
-}
+const auditPoints = [
+  {
+    icon: CheckCircle2,
+    iconColor: "text-[#2D4A3E]",
+    text: "HTML Structure: Header nesting was corrected from non-semantic divs."
+  },
+  {
+    icon: CheckCircle2,
+    iconColor: "text-[#2D4A3E]",
+    text: "Colors: Sage variables mapped directly to spec color palette."
+  },
+  {
+    icon: AlertTriangle,
+    iconColor: "text-[#B97B58]",
+    text: "Accessibility: Add appropriate aria-labels to raw SVG vectors in your navbar."
+  },
+  {
+    icon: Check,
+    iconColor: "text-[#2D4A3E]",
+    text: "Fidelity: Layout aligns perfectly on mobile break with 0px visual offset!"
+  }
+];
 
 export default function AiFeedbackSection() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
-
-  // Panel is crisp from arrival
-  const panelOpacity = useTransform(scrollYProgress, [0, 0.05], [0.95, 1]);
-
-  // Thumbnails appear right alongside items: 0.22 to 0.38
-  const thumbsOpacity = useTransform(scrollYProgress, [0.22, 0.35], [0, 1]);
-  const thumbsY = useTransform(scrollYProgress, [0.22, 0.35], [8, 0]);
-
-  // Exit transition
-  const exitOpacity = useTransform(scrollYProgress, [0.8, 1], [1, 0.4]);
-
   return (
-    <section ref={containerRef} className="relative h-[160vh] bg-[#050606] border-t border-neutral-900">
-      <div className="sticky top-0 h-screen flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 px-6 bg-grain">
+    <section className="bg-[#F7F5EE] py-20 md:py-28 border-t border-[#E0DAC9]">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
         
-        {/* Left: Typography */}
-        <motion.div style={{ opacity: exitOpacity }} className="w-full md:w-1/3 flex flex-col items-start z-10">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="font-mono text-xs tracking-[0.2em] uppercase text-[#ccff00]">05 // Feedback</span>
+        {/* Section Header */}
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EAE6DB] text-[#456153] text-[11px] font-mono tracking-wider font-semibold uppercase mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#4E7A65]"></span>
+            Detailed Feedback
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl md:text-6xl uppercase tracking-tight text-white mb-4">
-            Detailed Feedback. <span className="text-neutral-500">Real Improvement.</span>
+          <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#233E31] mb-3">
+            Detailed feedback. Real improvement.
           </h2>
-          <p className="text-neutral-400 font-body text-base md:text-lg">
-            An AI agent evaluates code semantics, visual alignment, and accessibility issues.
+          <p className="text-[#556E61] text-sm sm:text-base leading-relaxed">
+            Our analysis engine flags pixel differences, accessibility omissions, and markup structure issues.
           </p>
-        </motion.div>
-
-        {/* Right: AI Panel */}
-        <div className="w-full md:w-1/2 max-w-xl z-20">
-          <motion.div 
-            style={{ opacity: panelOpacity }}
-            className="border border-neutral-800 bg-[#080909] p-5 md:p-6 shadow-2xl relative"
-          >
-            {/* Header */}
-            <div className="flex justify-between items-center mb-5 pb-3 border-b border-neutral-900">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#ccff00] animate-pulse"></div>
-                <span className="font-mono text-xs tracking-widest uppercase text-white">AI Agent Review</span>
-              </div>
-              <span className="font-mono text-[10px] tracking-widest uppercase text-neutral-500">Confidence: 98%</span>
-            </div>
-
-            {/* List */}
-            <div className="flex flex-col gap-2 mb-5">
-              <FeedbackItem 
-                icon={CheckCircle2} 
-                text="Overall layout matches the reference closely. The grid structure is precise." 
-                progress={scrollYProgress} 
-                index={0} 
-              />
-              <FeedbackItem 
-                icon={CheckCircle2} 
-                text="Responsive implementation works well across breakpoints." 
-                progress={scrollYProgress} 
-                index={1} 
-              />
-              <FeedbackItem 
-                icon={AlertTriangle} 
-                text="Navigation is 24px wider than the reference on mobile." 
-                progress={scrollYProgress} 
-                index={2} 
-                isWarning 
-              />
-              <FeedbackItem 
-                icon={AlertTriangle} 
-                text="Consider improving color contrast for accessibility on the secondary text." 
-                progress={scrollYProgress} 
-                index={3} 
-                isWarning 
-              />
-              <FeedbackItem 
-                icon={CheckCircle2} 
-                text="Clean component structure and semantic HTML." 
-                progress={scrollYProgress} 
-                index={4} 
-              />
-            </div>
-
-            {/* Thumbnails */}
-            <motion.div 
-              style={{ opacity: thumbsOpacity, y: thumbsY }}
-              className="flex gap-4 pt-3 border-t border-neutral-900"
-            >
-              <div className="flex-1">
-                <span className="block font-mono text-[9px] tracking-widest uppercase text-neutral-500 mb-1.5">Reference</span>
-                <div className="w-full h-16 bg-neutral-900 border border-neutral-800"></div>
-              </div>
-              <div className="flex-1">
-                <span className="block font-mono text-[9px] tracking-widest uppercase text-neutral-500 mb-1.5">Your Output</span>
-                <div className="w-full h-16 bg-[#0a0a0a] border border-[#ccff00]/30 relative">
-                  <div className="absolute inset-x-2 top-2 h-2 bg-red-500/20 border border-red-500/50"></div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
         </div>
+
+        {/* AI Auditor Feedback Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="max-w-3xl mx-auto bg-[#EFECE3] border-2 border-[#557564] rounded-2xl p-6 sm:p-10 shadow-xs"
+        >
+          {/* Card Header */}
+          <div className="flex items-center justify-between pb-6 mb-6 border-b border-[#DDD7C8]">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-full bg-[#2D4A3E] flex items-center justify-center text-[#F7F5EE] font-serif font-bold text-lg">
+                🌿
+              </div>
+              <div>
+                <h3 className="font-serif text-lg sm:text-xl font-bold text-[#233E31]">
+                  AI Bamboo Auditor
+                </h3>
+                <p className="text-xs font-mono text-[#556E61]">
+                  Audit complete · 3 issues resolved
+                </p>
+              </div>
+            </div>
+
+            <span className="px-3 py-1 rounded-full bg-[#DFD9CC] text-[#2D4A3E] text-xs font-mono font-medium">
+              98% Confidence
+            </span>
+          </div>
+
+          {/* Feedback Points List */}
+          <div className="flex flex-col gap-4">
+            {auditPoints.map((pt, idx) => {
+              const Icon = pt.icon;
+              return (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: 0.15 + idx * 0.1 }}
+                  className="flex items-start gap-3.5 text-xs sm:text-sm text-[#385345] leading-relaxed"
+                >
+                  <Icon className={`w-4 h-4 mt-0.5 shrink-0 ${pt.iconColor}`} />
+                  <span>{pt.text}</span>
+                </motion.div>
+              );
+            })}
+          </div>
+
+        </motion.div>
 
       </div>
     </section>

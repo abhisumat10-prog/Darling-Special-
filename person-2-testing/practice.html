@@ -166,30 +166,28 @@
     });
 
     function packageResults() {
-  const finalPackage = {
-    similarityScore: window.lastSimilarityScore ?? null,
-    pixelsDifferent: window.lastPixelsDifferent ?? null,
-    accessibilityViolations: window.accessibilityResults || []
-  };
+      const finalPackage = {
+        similarityScore: window.lastSimilarityScore ?? null,
+        pixelsDifferent: window.lastPixelsDifferent ?? null,
+        accessibilityViolations: window.accessibilityResults || []
+      };
 
-  console.log("📦 Final package for Person 3:", finalPackage);
+      console.log("📦 Final package for Person 3:", finalPackage);
 
-  const packageResultDiv = document.getElementById('result');
+      const packageResultDiv = document.getElementById('result');
 
-  const packageHeading = document.createElement('h3');
-  packageHeading.textContent = '📦 Final Package (this goes to Person 3):';
-  packageResultDiv.appendChild(packageHeading);
+      const packageHeading = document.createElement('h3');
+      packageHeading.textContent = '📦 Final Package (this goes to Person 3):';
+      packageResultDiv.appendChild(packageHeading);
 
-  const packageDisplay = document.createElement('pre');
-  packageDisplay.style.textAlign = 'left';
-  packageDisplay.style.background = '#f0f0f0';
-  packageDisplay.style.padding = '10px';
-  packageDisplay.style.display = 'inline-block';
-  packageDisplay.textContent = JSON.stringify(finalPackage, null, 2);
-  packageResultDiv.appendChild(packageDisplay);
-
-  sendToGradingEndpoint(finalPackage, document.getElementById('submission-box').outerHTML);  // ← THIS is the new line
-}
+      const packageDisplay = document.createElement('pre');
+      packageDisplay.style.textAlign = 'left';
+      packageDisplay.style.background = '#f0f0f0';
+      packageDisplay.style.padding = '10px';
+      packageDisplay.style.display = 'inline-block';
+      packageDisplay.textContent = JSON.stringify(finalPackage, null, 2);
+      packageResultDiv.appendChild(packageDisplay);
+    }
   </script>
 <script>
   async function sendToGradingEndpoint(finalPackage, submittedCode) {

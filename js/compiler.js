@@ -68,13 +68,20 @@ class CodeCompilerEngine {
       this.editorManager.highlightErrorLines('css', cssError.lines, cssError.message);
       return false;
     }
+    // 4. Validate JSX Syntax & Multiple Line Errors
+const jsxError = this.validateJSX(buffers.jsx);
+if (jsxError) {
+  this.setCompilerStatus('error', 'JSX Error');
+  this.editorManager.highlightErrorLines('jsx', jsxError.lines, jsxError.message);
+  return false;
+}
 
     // Clear previous errors if all syntax is valid
     this.editorManager.clearErrorHighlights();
     this.setCompilerStatus('success', 'Compiled Successfully');
 
     // Render output into iframe
-    this.renderPreview(buffers.html, buffers.css, buffers.js);
+    this.renderPreview(buffers.html, buffers.css, buffers.js, buffers.jsx);
 
     // Save submitted progress if in Challenge 1 mode
     if (this.editorManager.mode === 'challenge') {
@@ -84,24 +91,26 @@ class CodeCompilerEngine {
     // Notify integration hooks for Persons 2, 3, 4
     if (!isInitial && window.notifySandboxSubmission) {
       window.notifySandboxSubmission({
-        html: buffers.html,
-        css: buffers.css,
-        js: buffers.js,
-        mode: this.editorManager.mode,
-        timestamp: new Date().toISOString()
-      });
+  html: buffers.html,
+  css: buffers.css,
+  js: buffers.js,
+  jsx: buffers.jsx,
+  mode: this.editorManager.mode,
+  timestamp: new Date().toISOString()
+});
     }
 
     if (!isInitial) {
       document.dispatchEvent(new CustomEvent('sandbox:submission', {
-        detail: {
-          html: buffers.html,
-          css: buffers.css,
-          js: buffers.js,
-          mode: this.editorManager.mode,
-          timestamp: new Date().toISOString()
-        }
-      }));
+  detail: {
+    html: buffers.html,
+    css: buffers.css,
+    js: buffers.js,
+    jsx: buffers.jsx,
+    mode: this.editorManager.mode,
+    timestamp: new Date().toISOString()
+  }
+}));
     }
 
     return true;
@@ -283,11 +292,47 @@ class CodeCompilerEngine {
 
     return null;
   }
+  validateJSX(jsxCode) {
+  if (!jsxCode || !jsxCode.trim()) return null;
 
-  renderPreview(html, css, js) {
-    if (!this.iframe) return;
+  try {
+    Babel.transform(jsxCode, { presets: ['react'] });
+  } catch (e) {
+    // Babel errors usually include a line number in e.loc
+    const line = e.loc && e.loc.line ? e.loc.line : 1;
+    return {
+      lines: [line],
+      message: e.message || 'JSX Syntax Error'
+    };
+  }
 
-    const fullDoc = `<!DOCTYPE html>
+  return null;
+}
+
+ renderPreview(html, css, js, jsx) {
+  if (!this.iframe) return;
+
+  const hasReact = jsx && jsx.trim().length > 0;
+
+  const reactScripts = hasReact ? `
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></scr` + `ipt>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></scr` + `ipt>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></scr` + `ipt>
+  ` : '';
+
+  const reactMount = hasReact ? `<div id="root"></div>` : '';
+
+  const reactScript = hasReact ? `
+    <script type="text/babel">
+      try {
+        ${jsx}
+      } catch(err) {
+        window.parent.postMessage({ type: 'IFRAME_RUNTIME_ERROR', message: 'React Error: ' + err.message }, '*');
+      }
+    </scr` + `ipt>
+  ` : '';
+
+  const fullDoc = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -295,9 +340,11 @@ class CodeCompilerEngine {
   <style>
     ${css}
   </style>
+  ${reactScripts}
 </head>
 <body>
   ${html}
+  ${reactMount}
   <script>
     window.addEventListener('error', function(e) {
       window.parent.postMessage({
@@ -315,11 +362,12 @@ class CodeCompilerEngine {
       }, '*');
     }
   </script>
+  ${reactScript}
 </body>
 </html>`;
 
-    this.iframe.srcdoc = fullDoc;
-  }
+  this.iframe.srcdoc = fullDoc;
+}
 
   setCompilerStatus(type, label) {
     if (!this.statusBadge) return;
