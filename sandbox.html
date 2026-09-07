@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PixelProof — Challenge Workspace</title>
+  <script>
+    (function() {
+      try {
+        const stored = localStorage.getItem('pixelproof_theme');
+        if (stored === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,6 +35,10 @@
     </div>
 
     <div class="header-actions">
+      <button id="sandbox-theme-toggle" class="btn-theme-toggle" aria-label="Toggle dark/light mode" title="Toggle theme">
+        <span class="theme-icon sun">☀️</span>
+        <span class="theme-icon moon">🌙</span>
+      </button>
       <div id="compiler-status" class="status-badge ready">
         <span class="dot-indicator"></span> Ready
       </div>
@@ -252,6 +268,17 @@
       viewDesktop.addEventListener('click', () => setViewport('desktop'));
       viewTablet.addEventListener('click', () => setViewport('tablet'));
       viewMobile.addEventListener('click', () => setViewport('mobile'));
+
+      // Sandbox Theme Toggle Handler
+      const themeToggle = document.getElementById('sandbox-theme-toggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+          const isDark = document.documentElement.classList.toggle('dark');
+          try {
+            localStorage.setItem('pixelproof_theme', isDark ? 'dark' : 'light');
+          } catch (e) {}
+        });
+      }
     });
   </script>
 

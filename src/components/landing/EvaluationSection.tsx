@@ -9,20 +9,20 @@ const metrics = [
 
 export default function EvaluationSection() {
   return (
-    <section className="bg-[#F7F5EE] py-20 md:py-28">
+    <section className="bg-[var(--bg-base)] py-20 md:py-28 transition-colors duration-250">
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col items-center text-center">
         
         {/* Tag Badge */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EAE6DB] text-[#456153] text-[11px] font-mono tracking-wider font-semibold uppercase mb-4">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#4E7A65]"></span>
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--bg-tag)] text-[var(--text-secondary)] text-[11px] font-mono tracking-wider font-semibold uppercase mb-4 border border-[var(--border-subtle)]">
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-sage)]"></span>
           Automated Evaluation
         </div>
 
         {/* Section Headline */}
-        <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#233E31] mb-3">
+        <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--text-primary)] mb-3">
           How close did you get?
         </h2>
-        <p className="text-[#556E61] text-sm sm:text-base max-w-xl mx-auto mb-16">
+        <p className="text-[var(--text-secondary)] text-sm sm:text-base max-w-xl mx-auto mb-16">
           Your implementation is graded across multiple functional dimensions.
         </p>
 
@@ -51,7 +51,8 @@ export default function EvaluationSection() {
                       cy="50"
                       r={radius}
                       fill="none"
-                      stroke="#E2EBE5"
+                      stroke="currentColor"
+                      className="text-[var(--border-subtle)]"
                       strokeWidth="5"
                     />
                     {/* Progress Stroke */}
@@ -60,7 +61,8 @@ export default function EvaluationSection() {
                       cy="50"
                       r={radius}
                       fill="none"
-                      stroke="#2C4C3D"
+                      stroke="currentColor"
+                      className="text-[var(--accent-primary)]"
                       strokeWidth="5"
                       strokeDasharray={circumference}
                       initial={{ strokeDashoffset: circumference }}
@@ -70,12 +72,12 @@ export default function EvaluationSection() {
                       strokeLinecap="round"
                     />
                   </svg>
-                  <span className="absolute font-serif text-2xl sm:text-3xl font-bold text-[#233E31]">
+                  <span className="absolute font-serif text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
                     {m.score}
                   </span>
                 </div>
 
-                <span className="text-xs sm:text-sm font-medium text-[#456153]">
+                <span className="text-xs sm:text-sm font-medium text-[var(--text-secondary)]">
                   {m.label}
                 </span>
               </motion.div>
@@ -91,10 +93,10 @@ export default function EvaluationSection() {
           transition={{ duration: 0.7, delay: 0.5 }}
           className="flex flex-col items-center"
         >
-          <span className="text-[11px] font-mono tracking-widest uppercase text-[#556E61] mb-2">
+          <span className="text-[11px] font-mono tracking-widest uppercase text-[var(--text-secondary)] mb-2">
             Overall Rating
           </span>
-          <div className="font-serif text-7xl sm:text-8xl md:text-9xl font-bold text-[#233E31] leading-none">
+          <div className="font-serif text-7xl sm:text-8xl md:text-9xl font-bold text-[var(--text-primary)] leading-none">
             78%
           </div>
         </motion.div>

@@ -2,6 +2,7 @@ import { useState, useId } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { X, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import ThemeToggle from '../components/common/ThemeToggle';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -40,23 +41,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F5EE] text-[#233E31] flex flex-col justify-between p-4 sm:p-6 md:p-10 selection:bg-[#2D4A3E] selection:text-[#F7F5EE]">
+    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] flex flex-col justify-between p-4 sm:p-6 md:p-10 selection:bg-[var(--accent-primary)] selection:text-[var(--accent-text)] transition-colors duration-250">
       {/* Top back navigation */}
       <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
         <Link 
           to="/"
-          className="inline-flex items-center gap-2 text-xs font-mono font-medium text-[#556E61] hover:text-[#233E31] transition-colors py-2"
+          className="inline-flex items-center gap-2 text-xs font-mono font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors py-2"
         >
           ← Back to Landing Page
         </Link>
-        <Link to="/" className="flex items-center gap-1.5 group">
-          <div className="w-5 h-5 rounded-full border border-[#233E31] flex items-center justify-center text-[#233E31] text-[10px] font-bold font-mono group-hover:rotate-90 transition-transform duration-300">
-            ✕
-          </div>
-          <span className="font-serif italic text-lg font-semibold tracking-tight text-[#233E31]">
-            PixelProof
-          </span>
-        </Link>
+        <div className="flex items-center gap-4">
+          <ThemeToggle />
+          <Link to="/" className="flex items-center gap-1.5 group">
+            <div className="w-5 h-5 rounded-full border border-[var(--text-primary)] flex items-center justify-center text-[var(--text-primary)] text-[10px] font-bold font-mono group-hover:rotate-90 transition-transform duration-300">
+              ✕
+            </div>
+            <span className="font-serif italic text-lg font-semibold tracking-tight text-[var(--text-primary)]">
+              PixelProof
+            </span>
+          </Link>
+        </div>
       </div>
 
       {/* Centered Login Card */}
@@ -65,15 +69,15 @@ export default function LoginPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="w-full max-w-[440px] bg-[#FAF9F5] border border-[#DDD8C9] rounded-[24px] p-6 sm:p-8 shadow-[0_8px_30px_rgb(35,62,49,0.06)] relative overflow-hidden"
+          className="w-full max-w-[440px] bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-[24px] p-6 sm:p-8 shadow-sm relative overflow-hidden transition-colors duration-250"
         >
           {/* Subtle top organic accent line */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-[#2D4A3E]" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-[var(--accent-primary)]" />
 
           {/* Top Bar: Label & Close Button */}
           <div className="flex items-center justify-between mb-6">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#EAE6DB] text-[#456153] text-[10px] font-mono tracking-wider font-semibold uppercase">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#4E7A65]"></span>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--bg-tag)] text-[var(--text-secondary)] text-[10px] font-mono tracking-wider font-semibold uppercase border border-[var(--border-subtle)]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-sage)]"></span>
               // PIXELPROOF AUTH
             </div>
 
@@ -81,7 +85,7 @@ export default function LoginPage() {
               type="button"
               onClick={() => navigate('/')}
               aria-label="Close and return to landing page"
-              className="w-7 h-7 rounded-full flex items-center justify-center text-[#556E61] hover:text-[#233E31] hover:bg-[#EAE6DB] transition-colors"
+              className="w-7 h-7 rounded-full flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tag)] transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -89,10 +93,10 @@ export default function LoginPage() {
 
           {/* Title and Subtitle */}
           <div className="mb-6">
-            <h1 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-[#233E31] mb-1.5">
+            <h1 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] mb-1.5">
               Welcome Back
             </h1>
-            <p className="text-xs sm:text-sm text-[#556E61] leading-relaxed">
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
               Continue your frontend engineering challenges.
             </p>
           </div>
@@ -102,9 +106,9 @@ export default function LoginPage() {
             {/* GitHub */}
             <button
               type="button"
-              className="flex items-center justify-center gap-2 py-2.5 px-3 bg-[#FFFFFF] border border-[#DDD8C9] rounded-xl text-xs font-semibold text-[#233E31] hover:border-[#9AB3A5] hover:bg-[#FDFDFB] transition-all shadow-xs"
+              className="flex items-center justify-center gap-2 py-2.5 px-3 bg-[var(--bg-surface-secondary)] border border-[var(--border-subtle)] rounded-xl text-xs font-semibold text-[var(--text-primary)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-tag)] transition-all shadow-xs"
             >
-              <svg className="w-4 h-4 fill-current text-[#233E31]" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 fill-current text-[var(--text-primary)]" viewBox="0 0 24 24">
                 <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
               </svg>
               <span>GitHub</span>
@@ -113,7 +117,7 @@ export default function LoginPage() {
             {/* Google */}
             <button
               type="button"
-              className="flex items-center justify-center gap-2 py-2.5 px-3 bg-[#FFFFFF] border border-[#DDD8C9] rounded-xl text-xs font-semibold text-[#233E31] hover:border-[#9AB3A5] hover:bg-[#FDFDFB] transition-all shadow-xs"
+              className="flex items-center justify-center gap-2 py-2.5 px-3 bg-[var(--bg-surface-secondary)] border border-[var(--border-subtle)] rounded-xl text-xs font-semibold text-[var(--text-primary)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-tag)] transition-all shadow-xs"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -127,8 +131,8 @@ export default function LoginPage() {
 
           {/* Divider */}
           <div className="relative flex items-center justify-center mb-6">
-            <div className="border-t border-[#DDD8C9] w-full" />
-            <span className="bg-[#FAF9F5] px-3 font-mono text-[10px] tracking-wider uppercase text-[#7A9185] whitespace-nowrap absolute right-0">
+            <div className="border-t border-[var(--border-subtle)] w-full" />
+            <span className="bg-[var(--bg-card)] px-3 font-mono text-[10px] tracking-wider uppercase text-[var(--text-muted)] whitespace-nowrap absolute">
               OR WITH EMAIL
             </span>
           </div>
@@ -136,14 +140,14 @@ export default function LoginPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-2.5 rounded-lg bg-[#F8ECEB] border border-[#E9C3BE] text-[#C54A40] text-xs leading-relaxed" role="alert">
+              <div className="p-2.5 rounded-lg bg-[var(--bg-surface-secondary)] border border-[var(--border-strong)] text-[var(--accent-amber)] text-xs leading-relaxed" role="alert">
                 {error}
               </div>
             )}
 
             {/* Email Field */}
             <div className="space-y-1.5 text-left">
-              <label htmlFor={emailId} className="block font-mono text-[11px] font-semibold text-[#233E31]">
+              <label htmlFor={emailId} className="block font-mono text-[11px] font-semibold text-[var(--text-primary)]">
                 Email Address
               </label>
               <input 
@@ -153,20 +157,20 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="alex@pixelproof.dev"
-                className="w-full px-3.5 py-2.5 bg-[#FFFFFF] border border-[#DDD8C9] rounded-xl text-xs sm:text-sm text-[#233E31] placeholder:text-[#9AB3A5] focus:outline-none focus:border-[#2D4A3E] focus:ring-1 focus:ring-[#2D4A3E] transition-all shadow-2xs"
+                className="w-full px-3.5 py-2.5 bg-[var(--bg-surface-secondary)] border border-[var(--border-subtle)] rounded-xl text-xs sm:text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-all shadow-2xs"
               />
             </div>
 
             {/* Password Field */}
             <div className="space-y-1.5 text-left">
               <div className="flex items-center justify-between">
-                <label htmlFor={passwordId} className="font-mono text-[11px] font-semibold text-[#233E31]">
+                <label htmlFor={passwordId} className="font-mono text-[11px] font-semibold text-[var(--text-primary)]">
                   Password
                 </label>
                 <a 
                   href="#forgot" 
                   onClick={(e) => { e.preventDefault(); setError('Password reset instructions will be sent once backend is connected.'); }}
-                  className="font-mono text-[11px] text-[#4E7A65] hover:underline"
+                  className="font-mono text-[11px] text-[var(--accent-primary)] hover:underline"
                 >
                   Forgot password?
                 </a>
@@ -179,13 +183,13 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full px-3.5 py-2.5 bg-[#FFFFFF] border border-[#DDD8C9] rounded-xl text-xs sm:text-sm text-[#233E31] placeholder:text-[#9AB3A5] focus:outline-none focus:border-[#2D4A3E] focus:ring-1 focus:ring-[#2D4A3E] transition-all shadow-2xs pr-10"
+                  className="w-full px-3.5 py-2.5 bg-[var(--bg-surface-secondary)] border border-[var(--border-subtle)] rounded-xl text-xs sm:text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-all shadow-2xs pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#7A9185] hover:text-[#233E31] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -199,9 +203,9 @@ export default function LoginPage() {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-[#C8D6CD] text-[#2D4A3E] focus:ring-[#2D4A3E] accent-[#2D4A3E] cursor-pointer"
+                className="w-4 h-4 rounded border-[var(--border-subtle)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)] accent-[var(--accent-primary)] cursor-pointer"
               />
-              <label htmlFor={rememberId} className="text-xs text-[#556E61] cursor-pointer select-none">
+              <label htmlFor={rememberId} className="text-xs text-[var(--text-secondary)] cursor-pointer select-none">
                 Remember this session for 30 days
               </label>
             </div>
@@ -210,7 +214,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-3.5 px-4 rounded-full bg-[#234A35] text-[#F7F5EE] font-mono text-xs tracking-wider uppercase font-semibold hover:bg-[#1A3828] transition-all hover:scale-[1.01] shadow-sm flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full mt-2 py-3.5 px-4 rounded-full bg-[var(--accent-primary)] text-[var(--accent-text)] font-mono text-xs tracking-wider uppercase font-semibold hover:bg-[var(--accent-hover)] transition-all hover:scale-[1.01] shadow-sm flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               <span>{loading ? 'AUTHENTICATING...' : 'SIGN IN TO PIXELPROOF'}</span>
               {!loading && <ArrowRight className="w-3.5 h-3.5" />}
@@ -218,21 +222,21 @@ export default function LoginPage() {
           </form>
 
           {/* Footer Prompt */}
-          <div className="mt-6 pt-5 border-t border-[#EAE6DB] text-center">
-            <p className="text-xs text-[#556E61]">
+          <div className="mt-6 pt-5 border-t border-[var(--border-subtle)] text-center">
+            <p className="text-xs text-[var(--text-secondary)]">
               New to PixelProof?{' '}
               <a 
                 href="#signup" 
                 onClick={(e) => { e.preventDefault(); setError('Account registration will be active with the auth backend.'); }}
-                className="font-semibold text-[#234A35] hover:underline"
+                className="font-semibold text-[var(--accent-primary)] hover:underline"
               >
                 Create an account
               </a>
             </p>
 
             {/* Security status */}
-            <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-[#7A9185]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#4E7A65]"></span>
+            <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-[var(--text-muted)]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-sage)]"></span>
               <span>256-BIT ENCRYPTED SESSION</span>
             </div>
           </div>
@@ -240,7 +244,7 @@ export default function LoginPage() {
       </div>
 
       {/* Bottom minimal note */}
-      <div className="text-center text-xs font-mono text-[#7A9185] py-2">
+      <div className="text-center text-xs font-mono text-[var(--text-muted)] py-2">
         © {new Date().getFullYear()} PixelProof. Protected by secure challenge protocols.
       </div>
     </div>
