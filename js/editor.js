@@ -104,34 +104,34 @@
       }
     }
 
-    loadInitialBuffers() {
-      if (this.mode === 'tutorial') {
-    const spec = window.TUTORIAL_SPEC;
-    this.codeBuffers.html = spec.starterCode.html;
-    this.codeBuffers.css = spec.starterCode.css;
-    this.codeBuffers.js = spec.starterCode.js;
-    this.codeBuffers.jsx = spec.starterCode.jsx || '';
-    this.hasUnsubmittedEdits = false;
-  } else {
-        // Challenge 1 mode: restore saved code attempt if available
-        const savedCode = localStorage.getItem(this.storageKey);
-        if (savedCode) {
-          try {
-    const parsed = JSON.parse(savedCode);
-    this.codeBuffers.html = parsed.html || this.challengeSpec.starterCode.html;
-    this.codeBuffers.css = parsed.css || this.challengeSpec.starterCode.css;
-    this.codeBuffers.js = parsed.js || this.challengeSpec.starterCode.js;
-    this.codeBuffers.jsx = parsed.jsx || this.challengeSpec.starterCode.jsx || '';
-    console.log(`[Editor] Restored saved code attempt for ${this.challengeSpec.title}.`);
-  } catch {
-    this.loadDefaultChallengeCode();
-  }
-        } else {
-          this.loadDefaultChallengeCode();
-        }
-        this.hasUnsubmittedEdits = false;
-      }
+  loadInitialBuffers() {
+    if (this.mode === 'tutorial') {
+      const spec = window.TUTORIAL_SPEC;
+      this.codeBuffers.html = spec.starterCode.html;
+      this.codeBuffers.css = spec.starterCode.css;
+      this.codeBuffers.js = spec.starterCode.js;
+      this.codeBuffers.jsx = spec.starterCode.jsx || '';
+      this.hasUnsubmittedEdits = false;
+      return;
     }
+
+    const savedCode = localStorage.getItem(this.storageKey);
+    if (savedCode) {
+      try {
+        const parsed = JSON.parse(savedCode);
+        this.codeBuffers.html = parsed.html || this.challengeSpec.starterCode.html;
+        this.codeBuffers.css = parsed.css || this.challengeSpec.starterCode.css;
+        this.codeBuffers.js = parsed.js || this.challengeSpec.starterCode.js;
+        this.codeBuffers.jsx = parsed.jsx || this.challengeSpec.starterCode.jsx || '';
+        console.log(`[Editor] Restored saved code attempt for ${this.challengeSpec.title}.`);
+      } catch {
+        this.loadDefaultChallengeCode();
+      }
+    } else {
+      this.loadDefaultChallengeCode();
+    }
+    this.hasUnsubmittedEdits = false;
+  }
 
   loadDefaultChallengeCode() {
     const spec = this.challengeSpec;
