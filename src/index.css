@@ -1,57 +1,111 @@
 @import "tailwindcss";
 
+:root {
+  /* LIGHT THEME TOKENS (Warm Beige / Cream / Botanical) */
+  --bg-base: #F7F5EE;
+  --bg-surface: #FFFFFF;
+  --bg-surface-secondary: #EDE9DE;
+  --bg-card: #FAF9F5;
+  --bg-tag: #EAE6DB;
+  --border-subtle: #DDD8C9;
+  --border-strong: #557564;
+  --text-primary: #233E31;
+  --text-secondary: #556E61;
+  --text-muted: #7A9185;
+  --accent-primary: #2D4A3E;
+  --accent-hover: #1E332A;
+  --accent-text: #F7F5EE;
+  --accent-amber: #B97B58;
+  --accent-sage: #9AB3A5;
+  --accent-deep: #33483B;
+  --code-bg: #19221C;
+  --code-text: #EAE6DB;
+  --code-border: #2B3B31;
+}
+
+.dark {
+  /* DARK THEME TOKENS (Deep Espresso Night / Warm Ivory / Muted Bamboo) */
+  --bg-base: #191512;
+  --bg-surface: #241D19;
+  --bg-surface-secondary: #2F2722;
+  --bg-card: #28211C;
+  --bg-tag: #3A302A;
+  --border-subtle: #3E342D;
+  --border-strong: #71806B;
+  --text-primary: #EBDCC9;
+  --text-secondary: #B7A89A;
+  --text-muted: #8F8173;
+  --accent-primary: #D4B18A;
+  --accent-hover: #E2C29D;
+  --accent-text: #191512;
+  --accent-amber: #D4B18A;
+  --accent-sage: #71806B;
+  --accent-deep: #33483B;
+  --code-bg: #14100D;
+  --code-text: #EBDCC9;
+  --code-border: #382D26;
+}
+
 @theme {
-  --color-dark: #080909;
-  --color-darker: #050606;
-  --color-light: #f5f5f5;
-  --color-accent: #ccff00;
+  --color-bg-base: var(--bg-base);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-surface-secondary: var(--bg-surface-secondary);
+  --color-bg-card: var(--bg-card);
+  --color-bg-tag: var(--bg-tag);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
   
-  --font-display: "Impact", "Arial Narrow", "Helvetica Neue", sans-serif;
-  --font-body: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-text: var(--accent-text);
+  --color-accent-amber: var(--accent-amber);
+  --color-accent-sage: var(--accent-sage);
+  --color-accent-deep: var(--accent-deep);
+  
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", monospace;
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
-    background-color: var(--color-dark);
-    color: var(--color-light);
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    transition: background-color 250ms ease, color 250ms ease;
   }
   body {
-    background-color: var(--color-dark);
-    color: var(--color-light);
-    font-family: var(--font-body);
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 250ms ease, color 250ms ease;
   }
 }
 
-/* Custom grain texture */
-.bg-grain {
-  position: relative;
-}
-.bg-grain::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 50;
-  opacity: 0.8;
-}
-
-/* Scrollbar styling */
+/* Custom subtle scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-dark);
+  background: var(--bg-base);
 }
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: var(--border-subtle);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: var(--accent-sage);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html, body, * {
+    transition-duration: 0.01ms !important;
+  }
 }

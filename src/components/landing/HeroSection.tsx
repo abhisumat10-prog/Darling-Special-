@@ -1,87 +1,94 @@
-import { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'motion/react';
-import { ArrowRight, Play } from 'lucide-react';
+import { motion } from 'motion/react';
+import { ArrowRight, ArrowDown } from 'lucide-react';
 
 export default function HeroSection() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"]
-  });
-
-  // Smooth immediate reaction to scroll
-  const yText = useTransform(scrollYProgress, [0, 0.8], ["0%", "30%"]);
-  const opacityText = useTransform(scrollYProgress, [0, 0.65], [1, 0.2]);
-  const scaleVisual = useTransform(scrollYProgress, [0, 0.8], [0.9, 1.08]);
-  const yVisual = useTransform(scrollYProgress, [0, 0.8], ["10%", "-5%"]);
-
   return (
-    <section ref={containerRef} className="relative h-[115vh] bg-dark">
-      <div className="sticky top-0 h-screen overflow-hidden flex flex-col justify-center bg-grain">
-        
-        {/* Typographic Hero */}
-        <motion.div 
-          style={{ y: yText, opacity: opacityText }}
-          className="relative z-10 container mx-auto px-6 md:px-12 flex flex-col items-start mt-12 md:mt-16"
-        >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-2 h-2 bg-[#ccff00] rounded-full animate-pulse"></div>
-            <span className="font-mono text-xs tracking-[0.2em] uppercase text-neutral-400">Frontend Engineering Platform</span>
-          </div>
+    <section className="relative bg-[var(--bg-base)] pt-12 md:pt-20 pb-20 md:pb-28 overflow-hidden transition-colors duration-250">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           
-          <h1 className="font-display text-[11vw] md:text-[9.5vw] leading-[0.88] uppercase tracking-tight text-white mb-6">
-            Good Frontend<br />
-            <span className="text-neutral-500">Developers</span><br />
-            Don't Copy.<br />
-            <span className="text-[#ccff00]">They Build.</span>
-          </h1>
-          
-          <div className="max-w-xl border-l border-neutral-800 pl-6 ml-1">
-            <p className="text-lg md:text-xl text-neutral-400 font-body mb-6 leading-relaxed">
-              Turn real designs into code. Get an AI-powered evaluation. Improve your frontend skills.
+          {/* Left Column: Copy & CTAs */}
+          <motion.div 
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            className="lg:col-span-6 flex flex-col items-start"
+          >
+            {/* Tag Badge */}
+            <div className="inline-flex items-center px-3 py-1 rounded-full bg-[var(--bg-tag)] text-[var(--text-secondary)] text-[11px] font-mono tracking-wider font-semibold uppercase mb-6 border border-[var(--border-subtle)]">
+              Practice Meets Perfection
+            </div>
+            
+            {/* Headline with editorial serif feel */}
+            <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[76px] leading-[1.05] tracking-tight text-[var(--text-primary)] mb-6">
+              Good frontend developers don't copy. <span className="font-sans font-bold">They build.</span>
+            </h1>
+            
+            {/* Subparagraph */}
+            <p className="text-base sm:text-lg text-[var(--text-secondary)] font-normal leading-relaxed mb-8 max-w-lg">
+              Stop copy-pasting template blocks. Face actual design specs, write clean component-based markup, and let our compiler critique your craft.
             </p>
-            <div className="flex flex-wrap items-center gap-4 md:gap-6">
-              <a href="/sandbox.html?mode=challenge1" className="group flex items-center gap-3 bg-[#ccff00] text-black px-7 py-3.5 font-mono text-xs md:text-sm tracking-widest font-bold uppercase transition-all hover:bg-white">
+            
+            {/* CTA buttons matching screenshot */}
+            <div className="flex flex-wrap items-center gap-4">
+              <a 
+                href="/sandbox.html?mode=challenge1" 
+                className="inline-flex items-center gap-2.5 bg-[var(--accent-primary)] text-[var(--accent-text)] px-6 py-3.5 rounded-full text-sm font-semibold hover:bg-[var(--accent-hover)] transition-all hover:scale-[1.02] shadow-sm"
+              >
                 Start Challenge #1
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="w-4 h-4" />
               </a>
-              <a href="/sandbox.html?mode=tutorial" className="group flex items-center gap-3 text-white px-7 py-3.5 font-mono text-xs md:text-sm tracking-widest uppercase border border-neutral-800 transition-all hover:border-[#ccff00]">
-                <Play className="w-4 h-4 text-[#ccff00]" />
+              <a 
+                href="/sandbox.html?mode=tutorial" 
+                className="inline-flex items-center gap-2.5 bg-[var(--bg-tag)] text-[var(--text-primary)] border border-[var(--border-subtle)] px-6 py-3.5 rounded-full text-sm font-semibold hover:bg-[var(--bg-surface-secondary)] transition-all hover:scale-[1.02]"
+              >
                 Tutorial Sandbox
+                <ArrowRight className="w-4 h-4" />
               </a>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
 
-        {/* Abstract Browser Visual */}
-        <motion.div 
-          style={{ scale: scaleVisual, y: yVisual }}
-          className="absolute right-[-8%] md:right-[-4%] top-[32%] w-[65vw] md:w-[50vw] h-[60vh] md:h-[65vh] border border-neutral-800 bg-[#050606] shadow-2xl flex flex-col z-0 origin-bottom-right"
-        >
-          {/* Browser Header */}
-          <div className="h-9 border-b border-neutral-800 flex items-center px-4 gap-2">
-            <div className="w-2 h-2 rounded-full bg-neutral-700"></div>
-            <div className="w-2 h-2 rounded-full bg-neutral-700"></div>
-            <div className="w-2 h-2 rounded-full bg-neutral-700"></div>
-          </div>
-          {/* Browser Content (Abstract lines) */}
-          <div className="flex-1 p-6 flex flex-col gap-5 opacity-40">
-            <div className="w-full h-24 bg-neutral-900 border border-neutral-800"></div>
-            <div className="flex gap-5">
-              <div className="w-1/3 h-40 bg-neutral-900 border border-neutral-800"></div>
-              <div className="w-2/3 h-40 bg-neutral-900 border border-neutral-800 flex flex-col p-5 gap-3">
-                 <div className="w-1/2 h-3 bg-[#ccff00] opacity-60"></div>
-                 <div className="w-3/4 h-2 bg-neutral-700"></div>
-                 <div className="w-full h-2 bg-neutral-700"></div>
+          {/* Right Column: Lesson Sandbox Preview Card */}
+          <motion.div 
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
+            className="lg:col-span-6 flex justify-center lg:justify-end"
+          >
+            <div className="w-full max-w-xl rounded-2xl border-2 border-[var(--border-strong)] bg-[var(--bg-card)] p-6 sm:p-8 shadow-sm transition-colors duration-250">
+              {/* Card Header */}
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="font-serif text-xl sm:text-2xl font-bold text-[var(--text-primary)]">
+                  Lesson Sandbox
+                </h3>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--bg-tag)] text-[var(--text-secondary)] text-xs font-mono font-medium tracking-wide border border-[var(--border-subtle)]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-sage)]"></span>
+                  ACTIVE
+                </div>
               </div>
-            </div>
-          </div>
-        </motion.div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-6 md:left-12 flex items-center gap-3 text-neutral-500 font-mono text-[11px] tracking-widest uppercase">
-          <div className="w-px h-8 bg-gradient-to-b from-[#ccff00] to-transparent"></div>
-          Scroll to explore
+              {/* Botanical/Bamboo watercolor banner image */}
+              <div className="w-full h-44 sm:h-52 rounded-xl overflow-hidden mb-5 border border-[var(--border-subtle)] relative bg-[var(--bg-surface-secondary)] flex items-center justify-center">
+                <img 
+                  src="/bamboo-visual.png" 
+                  alt="Lesson Spec Visual" 
+                  className="w-full h-full object-cover object-center dark:brightness-90 dark:contrast-105 transition-all duration-250" 
+                />
+              </div>
+
+              {/* Description */}
+              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                Build this organic card using clean, semantic HTML structure and CSS variables. Let's see how close you get to the design spec!
+              </p>
+            </div>
+          </motion.div>
+
+        </div>
+
+        {/* Scroll To Explore Indicator */}
+        <div className="flex justify-center items-center gap-2 text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] pt-16">
+          <ArrowDown className="w-3.5 h-3.5 animate-bounce" />
+          <span>Scroll to explore</span>
         </div>
       </div>
     </section>

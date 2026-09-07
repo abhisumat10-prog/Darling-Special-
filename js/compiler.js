@@ -18,31 +18,36 @@ class CodeCompilerEngine {
   init() {
     if (this.submitBtn) {
       this.submitBtn.addEventListener('click', () => {
-        this.compileAndSubmit();
+        this.compileAndSubmit({ submit: true });
       });
     }
 
     if (this.runBtn) {
       this.runBtn.addEventListener('click', () => {
-        this.compileAndSubmit();
+        this.compileAndSubmit({ submit: false });
       });
     }
 
     // Listen for runtime errors from iframe
     window.addEventListener('message', (event) => {
       if (event.data && event.data.type === 'IFRAME_RUNTIME_ERROR') {
-        this.setCompilerStatus('error', 'Runtime Error');
-        this.editorManager.highlightErrorLines('js', [1], event.data.message);
+        const sourceTab = event.data.source === 'jsx' ? 'jsx' : 'js';
+        const sourceLabel = sourceTab === 'jsx' ? 'React Error' : 'JS Error';
+        const errorLine = Number.isInteger(event.data.line) && event.data.line > 0
+          ? event.data.line
+          : 1;
+        this.setCompilerStatus('error', sourceLabel);
+        this.editorManager.highlightErrorLines(sourceTab, [errorLine], event.data.message);
       }
     });
 
     // Initial compile on page load
     setTimeout(() => {
-      this.compileAndSubmit(true);
+      this.compileAndSubmit({ submit: false });
     }, 200);
   }
 
-  compileAndSubmit(isInitial = false) {
+  compileAndSubmit({ submit = false } = {}) {
     const buffers = this.editorManager.getCodeBuffers();
 
     // 1. Validate JavaScript Syntax & Multiple Line Errors
@@ -68,40 +73,49 @@ class CodeCompilerEngine {
       this.editorManager.highlightErrorLines('css', cssError.lines, cssError.message);
       return false;
     }
+    // 4. Validate JSX Syntax & Multiple Line Errors
+const jsxError = this.validateJSX(buffers.jsx);
+if (jsxError) {
+  this.setCompilerStatus('error', 'JSX Error');
+  this.editorManager.highlightErrorLines('jsx', jsxError.lines, jsxError.message);
+  return false;
+}
 
     // Clear previous errors if all syntax is valid
     this.editorManager.clearErrorHighlights();
     this.setCompilerStatus('success', 'Compiled Successfully');
 
     // Render output into iframe
-    this.renderPreview(buffers.html, buffers.css, buffers.js);
+    this.renderPreview(buffers.html, buffers.css, buffers.js, buffers.jsx);
 
-    // Save submitted progress if in Challenge 1 mode
-    if (this.editorManager.mode === 'challenge') {
+    // Preview runs never save or grade. Only a successful Submit does both.
+    if (submit && this.editorManager.mode === 'challenge') {
       this.editorManager.saveSubmittedCode();
     }
 
     // Notify integration hooks for Persons 2, 3, 4
-    if (!isInitial && window.notifySandboxSubmission) {
+    if (submit && window.notifySandboxSubmission) {
       window.notifySandboxSubmission({
-        html: buffers.html,
-        css: buffers.css,
-        js: buffers.js,
-        mode: this.editorManager.mode,
-        timestamp: new Date().toISOString()
-      });
+  html: buffers.html,
+  css: buffers.css,
+  js: buffers.js,
+  jsx: buffers.jsx,
+  mode: this.editorManager.mode,
+  timestamp: new Date().toISOString()
+});
     }
 
-    if (!isInitial) {
+    if (submit) {
       document.dispatchEvent(new CustomEvent('sandbox:submission', {
-        detail: {
-          html: buffers.html,
-          css: buffers.css,
-          js: buffers.js,
-          mode: this.editorManager.mode,
-          timestamp: new Date().toISOString()
-        }
-      }));
+  detail: {
+    html: buffers.html,
+    css: buffers.css,
+    js: buffers.js,
+    jsx: buffers.jsx,
+    mode: this.editorManager.mode,
+    timestamp: new Date().toISOString()
+  }
+}));
     }
 
     return true;
@@ -283,11 +297,130 @@ class CodeCompilerEngine {
 
     return null;
   }
+  validateJSX(jsxCode) {
+  if (!jsxCode || !jsxCode.trim()) return null;
 
-  renderPreview(html, css, js) {
-    if (!this.iframe) return;
+  if (!window.Babel || typeof window.Babel.transform !== 'function') {
+    return {
+      lines: [1],
+      message: 'React compiler failed to load. Refresh the page and try again.'
+    };
+  }
 
-    const fullDoc = `<!DOCTYPE html>
+  try {
+    this.compileJSX(jsxCode);
+  } catch (e) {
+    // Babel errors usually include a line number in e.loc
+    const line = e.loc && e.loc.line ? e.loc.line : 1;
+    return {
+      lines: [line],
+      message: e.message || 'JSX Syntax Error'
+    };
+  }
+
+  return null;
+}
+
+ normalizeReactSource(jsxCode) {
+  let source = jsxCode;
+
+  // The sandbox provides React and ReactDOM as browser globals. Translate the
+  // common imports users paste from Vite/React files into those globals.
+  source = source.replace(
+    /import\s+React\s*,\s*\{([^}]+)\}\s+from\s+['"]react['"]\s*;?/g,
+    (_, names) => `const { ${names.replace(/\s+as\s+/g, ': ')} } = React;`
+  );
+  source = source.replace(/import\s+React\s+from\s+['"]react['"]\s*;?/g, '');
+  source = source.replace(
+    /import\s*\{([^}]+)\}\s*from\s*['"]react['"]\s*;?/g,
+    (_, names) => `const { ${names.replace(/\s+as\s+/g, ': ')} } = React;`
+  );
+  source = source.replace(
+    /import\s*\{([^}]+)\}\s*from\s*['"]react-dom\/client['"]\s*;?/g,
+    (_, names) => `const { ${names.replace(/\s+as\s+/g, ': ')} } = ReactDOM;`
+  );
+  source = source.replace(/import\s+ReactDOM\s+from\s+['"]react-dom(?:\/client)?['"]\s*;?/g, '');
+
+  source = source.replace(/export\s+default\s+function\s+App/g, 'function App');
+  source = source.replace(/export\s+default\s+class\s+App/g, 'class App');
+  source = source.replace(/export\s+default\s+App\s*;?/g, '');
+  source = source.replace(/export\s+default\s*\(/g, 'const App = (');
+
+  const definesApp = /\b(?:function|class|const|let|var)\s+App\b/.test(source);
+  const mountsReact = /\b(?:ReactDOM\.)?(?:createRoot|render)\s*\(/.test(source);
+  if (definesApp && !mountsReact) {
+    source += `\nReactDOM.createRoot(document.getElementById('root')).render(<App />);`;
+  }
+
+  return source;
+ }
+
+ compileJSX(jsxCode) {
+  const normalizedSource = this.normalizeReactSource(jsxCode);
+  return window.Babel.transform(normalizedSource, {
+    presets: ['react'],
+    parserOpts: { sourceType: 'script' },
+    filename: 'PixelProofReact.jsx'
+  }).code;
+ }
+
+ renderPreview(html, css, js, jsx) {
+  if (!this.iframe) return;
+
+  const hasReact = jsx && jsx.trim().length > 0;
+  const compiledReact = hasReact ? this.compileJSX(jsx) : '';
+  const serializedReact = JSON.stringify(compiledReact).replace(/</g, '\\u003c');
+
+  const reactScripts = hasReact ? `
+    <script>
+      window.module = undefined;
+      window.exports = undefined;
+    </scr` + `ipt>
+    <script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></scr` + `ipt>
+    <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></scr` + `ipt>
+  ` : '';
+
+  const reactMount = hasReact ? `<div id="root"></div>` : '';
+
+  const reactScript = hasReact ? `
+    <script>
+      window.__pixelProofRuntimeSource = 'jsx';
+      window.__pixelProofHasReact = true;
+      try {
+        if (!window.React || !window.ReactDOM) {
+          throw new Error('React runtime failed to load. Check the connection and run again.');
+        }
+        window.require = function(moduleName) {
+          if (moduleName === 'react') return window.React;
+          if (moduleName === 'react-dom' || moduleName === 'react-dom/client') return window.ReactDOM;
+          if (moduleName === 'react/jsx-runtime' || moduleName === 'react/jsx-dev-runtime') {
+            const createJsxElement = function(type, props, key) {
+              return window.React.createElement(type, key == null ? props : { ...props, key });
+            };
+            return {
+              Fragment: window.React.Fragment,
+              jsx: createJsxElement,
+              jsxs: createJsxElement,
+              jsxDEV: createJsxElement
+            };
+          }
+          throw new Error('Unsupported React import: ' + moduleName);
+        };
+        (0, eval)(${serializedReact});
+      } catch(err) {
+        window.parent.postMessage({
+          type: 'IFRAME_RUNTIME_ERROR',
+          source: 'jsx',
+          line: err.loc && err.loc.line ? err.loc.line : 1,
+          message: 'React Error: ' + err.message
+        }, '*');
+      } finally {
+        window.__pixelProofRuntimeSource = 'js';
+      }
+    </scr` + `ipt>
+  ` : '';
+
+  const fullDoc = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -295,31 +428,58 @@ class CodeCompilerEngine {
   <style>
     ${css}
   </style>
+  ${reactScripts}
 </head>
 <body>
-  ${html}
+  ${hasReact ? '' : html}
+  ${reactMount}
   <script>
+    const originalConsoleError = console.error.bind(console);
+    console.error = function(...args) {
+      originalConsoleError(...args);
+      const message = args.map(value => {
+        if (value instanceof Error) return value.message;
+        return typeof value === 'string' ? value : '';
+      }).filter(Boolean).join(' ');
+      const looksLikeReactError = window.__pixelProofHasReact &&
+        /(react|component|error boundary|render|hook)/i.test(message);
+      if (looksLikeReactError) {
+        window.parent.postMessage({
+          type: 'IFRAME_RUNTIME_ERROR',
+          source: 'jsx',
+          line: 1,
+          message: 'React Error: ' + message
+        }, '*');
+      }
+    };
+
     window.addEventListener('error', function(e) {
       window.parent.postMessage({
         type: 'IFRAME_RUNTIME_ERROR',
+        source: window.__pixelProofRuntimeSource || 'js',
+        line: e.lineno || 1,
         message: e.message + ' (Line ' + e.lineno + ')'
       }, '*');
     });
 
     try {
+      window.__pixelProofRuntimeSource = 'js';
       ${js}
     } catch(err) {
       window.parent.postMessage({
         type: 'IFRAME_RUNTIME_ERROR',
+        source: 'js',
+        line: err.lineNumber || 1,
         message: err.message
       }, '*');
     }
   </script>
+  ${reactScript}
 </body>
 </html>`;
 
-    this.iframe.srcdoc = fullDoc;
-  }
+  this.iframe.srcdoc = fullDoc;
+}
 
   setCompilerStatus(type, label) {
     if (!this.statusBadge) return;
