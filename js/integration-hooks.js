@@ -174,7 +174,7 @@ window.setupSandboxGrading = function setupSandboxGrading(activeSpec) {
     const combinedCode = `HTML:\n${submission.html}\n\nCSS:\n${submission.css}\n\nJavaScript:\n${submission.js}`;
 
     try {
-      const response = await fetch('http://127.0.0.1:3001/api/grade', {
+      const response = await fetch('/api/grade', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
