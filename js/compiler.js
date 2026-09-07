@@ -308,10 +308,7 @@ if (jsxError) {
   }
 
   try {
-    window.Babel.transform(jsxCode, {
-      presets: ['react'],
-      parserOpts: { sourceType: 'module' }
-    });
+    this.compileJSX(jsxCode);
   } catch (e) {
     // Babel errors usually include a line number in e.loc
     const line = e.loc && e.loc.line ? e.loc.line : 1;
@@ -324,25 +321,92 @@ if (jsxError) {
   return null;
 }
 
+ normalizeReactSource(jsxCode) {
+  let source = jsxCode;
+
+  // The sandbox provides React and ReactDOM as browser globals. Translate the
+  // common imports users paste from Vite/React files into those globals.
+  source = source.replace(
+    /import\s+React\s*,\s*\{([^}]+)\}\s+from\s+['"]react['"]\s*;?/g,
+    (_, names) => `const { ${names.replace(/\s+as\s+/g, ': ')} } = React;`
+  );
+  source = source.replace(/import\s+React\s+from\s+['"]react['"]\s*;?/g, '');
+  source = source.replace(
+    /import\s*\{([^}]+)\}\s*from\s*['"]react['"]\s*;?/g,
+    (_, names) => `const { ${names.replace(/\s+as\s+/g, ': ')} } = React;`
+  );
+  source = source.replace(
+    /import\s*\{([^}]+)\}\s*from\s*['"]react-dom\/client['"]\s*;?/g,
+    (_, names) => `const { ${names.replace(/\s+as\s+/g, ': ')} } = ReactDOM;`
+  );
+  source = source.replace(/import\s+ReactDOM\s+from\s+['"]react-dom(?:\/client)?['"]\s*;?/g, '');
+
+  source = source.replace(/export\s+default\s+function\s+App/g, 'function App');
+  source = source.replace(/export\s+default\s+class\s+App/g, 'class App');
+  source = source.replace(/export\s+default\s+App\s*;?/g, '');
+  source = source.replace(/export\s+default\s*\(/g, 'const App = (');
+
+  const definesApp = /\b(?:function|class|const|let|var)\s+App\b/.test(source);
+  const mountsReact = /\b(?:ReactDOM\.)?(?:createRoot|render)\s*\(/.test(source);
+  if (definesApp && !mountsReact) {
+    source += `\nReactDOM.createRoot(document.getElementById('root')).render(<App />);`;
+  }
+
+  return source;
+ }
+
+ compileJSX(jsxCode) {
+  const normalizedSource = this.normalizeReactSource(jsxCode);
+  return window.Babel.transform(normalizedSource, {
+    presets: ['react'],
+    parserOpts: { sourceType: 'script' },
+    filename: 'PixelProofReact.jsx'
+  }).code;
+ }
+
  renderPreview(html, css, js, jsx) {
   if (!this.iframe) return;
 
   const hasReact = jsx && jsx.trim().length > 0;
+  const compiledReact = hasReact ? this.compileJSX(jsx) : '';
+  const serializedReact = JSON.stringify(compiledReact).replace(/</g, '\\u003c');
 
   const reactScripts = hasReact ? `
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></scr` + `ipt>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></scr` + `ipt>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></scr` + `ipt>
+    <script>
+      window.module = undefined;
+      window.exports = undefined;
+    </scr` + `ipt>
+    <script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></scr` + `ipt>
+    <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></scr` + `ipt>
   ` : '';
 
   const reactMount = hasReact ? `<div id="root"></div>` : '';
 
   const reactScript = hasReact ? `
-    <script type="text/babel">
+    <script>
       window.__pixelProofRuntimeSource = 'jsx';
       window.__pixelProofHasReact = true;
       try {
-        ${jsx}
+        if (!window.React || !window.ReactDOM) {
+          throw new Error('React runtime failed to load. Check the connection and run again.');
+        }
+        window.require = function(moduleName) {
+          if (moduleName === 'react') return window.React;
+          if (moduleName === 'react-dom' || moduleName === 'react-dom/client') return window.ReactDOM;
+          if (moduleName === 'react/jsx-runtime' || moduleName === 'react/jsx-dev-runtime') {
+            const createJsxElement = function(type, props, key) {
+              return window.React.createElement(type, key == null ? props : { ...props, key });
+            };
+            return {
+              Fragment: window.React.Fragment,
+              jsx: createJsxElement,
+              jsxs: createJsxElement,
+              jsxDEV: createJsxElement
+            };
+          }
+          throw new Error('Unsupported React import: ' + moduleName);
+        };
+        (0, eval)(${serializedReact});
       } catch(err) {
         window.parent.postMessage({
           type: 'IFRAME_RUNTIME_ERROR',
@@ -367,7 +431,7 @@ if (jsxError) {
   ${reactScripts}
 </head>
 <body>
-  ${html}
+  ${hasReact ? '' : html}
   ${reactMount}
   <script>
     const originalConsoleError = console.error.bind(console);
