@@ -1,13 +1,15 @@
 import { useState, useId } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { X, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import ThemeToggle from '../components/common/ThemeToggle';
 import { useAuth } from '../context/auth-context';
-import { signIn, signUp } from '../services/auth';
+import { sendPasswordReset, signIn, signUp, updatePassword } from '../services/auth';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isPasswordRecovery = new URLSearchParams(location.search).get('reset') === '1';
   const { user, loading: sessionLoading, configured } = useAuth();
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [displayName, setDisplayName] = useState('');
@@ -28,6 +30,28 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     setMessage(null);
+
+    if (isPasswordRecovery) {
+      if (!password || password.length < 8) {
+        setError('Your new password must be at least 8 characters long.');
+        return;
+      }
+      if (!configured) {
+        setError('Supabase is not configured. Check the VITE_SUPABASE settings in your .env file.');
+        return;
+      }
+      setLoading(true);
+      try {
+        await updatePassword(password);
+        setMessage('Password updated successfully.');
+        navigate('/', { replace: true });
+      } catch (authError) {
+        setError(authError instanceof Error ? authError.message : 'Could not update your password. Request a new recovery link.');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
 
     if (!email || !email.includes('@')) {
       setError('Please enter a valid email address.');
@@ -66,7 +90,29 @@ export default function LoginPage() {
     }
   };
 
-  if (!sessionLoading && user) return <Navigate to="/" replace />;
+  const handleForgotPassword = async () => {
+    setError(null);
+    setMessage(null);
+    if (!email || !email.includes('@')) {
+      setError('Enter your email address first, then select Forgot password.');
+      return;
+    }
+    if (!configured) {
+      setError('Supabase is not configured. Check the VITE_SUPABASE settings in your .env file.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await sendPasswordReset(email);
+      setMessage('If an account exists for that email, a password reset link has been sent.');
+    } catch (authError) {
+      setError(authError instanceof Error ? authError.message : 'Could not send the password reset email.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!sessionLoading && user && !isPasswordRecovery) return <Navigate to="/" replace />;
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] flex flex-col justify-between p-4 sm:p-6 md:p-10 selection:bg-[var(--accent-primary)] selection:text-[var(--accent-text)] transition-colors duration-250">
@@ -122,17 +168,19 @@ export default function LoginPage() {
           {/* Title and Subtitle */}
           <div className="mb-6">
             <h1 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] mb-1.5">
-              {mode === 'signin' ? 'Welcome Back' : 'Create Your Account'}
+              {isPasswordRecovery ? 'Choose a New Password' : mode === 'signin' ? 'Welcome Back' : 'Create Your Account'}
             </h1>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-              {mode === 'signin'
+              {isPasswordRecovery
+                ? 'Enter a secure replacement password for your PixelProof account.'
+                : mode === 'signin'
                 ? 'Continue your frontend engineering challenges.'
                 : 'Save your challenge progress, scores, and improvement over time.'}
             </p>
           </div>
 
           {/* Social Logins */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
+          {!isPasswordRecovery && <div className="grid grid-cols-2 gap-3 mb-6">
             {/* GitHub */}
             <button
               type="button"
@@ -161,15 +209,15 @@ export default function LoginPage() {
               </svg>
               <span>Google</span>
             </button>
-          </div>
+          </div>}
 
           {/* Divider */}
-          <div className="relative flex items-center justify-center mb-6">
+          {!isPasswordRecovery && <div className="relative flex items-center justify-center mb-6">
             <div className="border-t border-[var(--border-subtle)] w-full" />
             <span className="bg-[var(--bg-card)] px-3 font-mono text-[10px] tracking-wider uppercase text-[var(--text-muted)] whitespace-nowrap absolute">
               OR WITH EMAIL
             </span>
-          </div>
+          </div>}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -184,7 +232,7 @@ export default function LoginPage() {
               </div>
             )}
 
-            {mode === 'signup' && (
+            {!isPasswordRecovery && mode === 'signup' && (
               <div className="space-y-1.5 text-left">
                 <label htmlFor={displayNameId} className="block font-mono text-[11px] font-semibold text-[var(--text-primary)]">
                   Display Name
@@ -202,7 +250,7 @@ export default function LoginPage() {
             )}
 
             {/* Email Field */}
-            <div className="space-y-1.5 text-left">
+            {!isPasswordRecovery && <div className="space-y-1.5 text-left">
               <label htmlFor={emailId} className="block font-mono text-[11px] font-semibold text-[var(--text-primary)]">
                 Email Address
               </label>
@@ -215,21 +263,21 @@ export default function LoginPage() {
                 placeholder="alex@pixelproof.dev"
                 className="w-full px-3.5 py-2.5 bg-[var(--bg-surface-secondary)] border border-[var(--border-subtle)] rounded-xl text-xs sm:text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-all shadow-2xs"
               />
-            </div>
+            </div>}
 
             {/* Password Field */}
             <div className="space-y-1.5 text-left">
               <div className="flex items-center justify-between">
                 <label htmlFor={passwordId} className="font-mono text-[11px] font-semibold text-[var(--text-primary)]">
-                  Password
+                  {isPasswordRecovery ? 'New Password' : 'Password'}
                 </label>
-                <a 
+                {!isPasswordRecovery && mode === 'signin' && <a
                   href="#forgot" 
-                  onClick={(e) => { e.preventDefault(); setError('Password reset instructions will be sent once backend is connected.'); }}
+                  onClick={(event) => { event.preventDefault(); void handleForgotPassword(); }}
                   className="font-mono text-[11px] text-[var(--accent-primary)] hover:underline"
                 >
                   Forgot password?
-                </a>
+                </a>}
               </div>
               <div className="relative">
                 <input 
@@ -253,7 +301,7 @@ export default function LoginPage() {
             </div>
 
             {/* Remember Me */}
-            <div className="flex items-center gap-2 pt-1 text-left">
+            {!isPasswordRecovery && <div className="flex items-center gap-2 pt-1 text-left">
               <input 
                 id={rememberId}
                 type="checkbox"
@@ -264,7 +312,7 @@ export default function LoginPage() {
               <label htmlFor={rememberId} className="text-xs text-[var(--text-secondary)] cursor-pointer select-none">
                 Keep me signed in on this device
               </label>
-            </div>
+            </div>}
 
             {/* Primary Submit CTA */}
             <button
@@ -272,7 +320,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full mt-2 py-3.5 px-4 rounded-full bg-[var(--accent-primary)] text-[var(--accent-text)] font-mono text-xs tracking-wider uppercase font-semibold hover:bg-[var(--accent-hover)] transition-all hover:scale-[1.01] shadow-sm flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              <span>{loading ? 'PLEASE WAIT...' : mode === 'signin' ? 'SIGN IN TO PIXELPROOF' : 'CREATE MY ACCOUNT'}</span>
+              <span>{loading ? 'PLEASE WAIT...' : isPasswordRecovery ? 'SAVE NEW PASSWORD' : mode === 'signin' ? 'SIGN IN TO PIXELPROOF' : 'CREATE MY ACCOUNT'}</span>
               {!loading && <ArrowRight className="w-3.5 h-3.5" />}
             </button>
           </form>
@@ -280,18 +328,22 @@ export default function LoginPage() {
           {/* Footer Prompt */}
           <div className="mt-6 pt-5 border-t border-[var(--border-subtle)] text-center">
             <p className="text-xs text-[var(--text-secondary)]">
-              {mode === 'signin' ? 'New to PixelProof?' : 'Already have an account?'}{' '}
+              {isPasswordRecovery ? 'Remembered your password?' : mode === 'signin' ? 'New to PixelProof?' : 'Already have an account?'}{' '}
               <a 
-                href={mode === 'signin' ? '#signup' : '#signin'}
+                href={isPasswordRecovery ? '/auth' : mode === 'signin' ? '#signup' : '#signin'}
                 onClick={(e) => {
                   e.preventDefault();
+                  if (isPasswordRecovery) {
+                    navigate('/auth', { replace: true });
+                    return;
+                  }
                   setMode(mode === 'signin' ? 'signup' : 'signin');
                   setError(null);
                   setMessage(null);
                 }}
                 className="font-semibold text-[var(--accent-primary)] hover:underline"
               >
-                {mode === 'signin' ? 'Create an account' : 'Sign in'}
+                {isPasswordRecovery ? 'Return to sign in' : mode === 'signin' ? 'Create an account' : 'Sign in'}
               </a>
             </p>
 

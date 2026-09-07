@@ -26,6 +26,19 @@ export async function signOut() {
   if (error) throw error
 }
 
+export async function sendPasswordReset(email: string) {
+  const { error } = await getSupabaseClient().auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/auth?reset=1`,
+  })
+  if (error) throw error
+}
+
+export async function updatePassword(password: string) {
+  const { data, error } = await getSupabaseClient().auth.updateUser({ password })
+  if (error) throw error
+  return data
+}
+
 export async function getCurrentSession() {
   const { data, error } = await getSupabaseClient().auth.getSession()
   if (error) throw error
