@@ -30,4 +30,14 @@ app.use((error, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Grading server running on port ${PORT}`));
+const HOST = process.env.HOST || "127.0.0.1";
+const server = app.listen(PORT, HOST, () => {
+  console.log(`Grading server running at http://${HOST}:${PORT}`);
+});
+
+server.on("error", (error) => {
+  console.error("Could not start grading server:", error.message);
+  process.exitCode = 1;
+});
+
+server.ref();
