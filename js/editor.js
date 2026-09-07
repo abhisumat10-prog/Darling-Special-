@@ -123,7 +123,7 @@
     this.codeBuffers.js = parsed.js || this.challengeSpec.starterCode.js;
     this.codeBuffers.jsx = parsed.jsx || this.challengeSpec.starterCode.jsx || '';
     console.log(`[Editor] Restored saved code attempt for ${this.challengeSpec.title}.`);
-  } catch (e) {
+  } catch {
     this.loadDefaultChallengeCode();
   }
         } else {
